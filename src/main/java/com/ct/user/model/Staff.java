@@ -1,5 +1,6 @@
 package com.ct.user.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,6 +21,7 @@ public class Staff {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "staff_id")
 	private long staffId;
 	private int roleId;
 	private int empId;

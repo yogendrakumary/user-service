@@ -46,7 +46,7 @@ public class StaffServiceImpl implements StaffService {
 		Staff dbStaff = this.getStaff(id);
 		dbStaff.setDeleted(true);
 		dbStaff.setActive(false);
-		
+
 		staffRepository.save(dbStaff);
 	}
 
