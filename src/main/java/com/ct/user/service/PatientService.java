@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ct.user.model.Patient;
 
-public interface PatientService {
+public interface PatientService extends UserService {
 
 	List<Patient> getAllPatients();
 

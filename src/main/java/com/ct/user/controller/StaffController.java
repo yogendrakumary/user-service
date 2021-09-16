@@ -31,6 +31,18 @@ public class StaffController {
 
 	@Autowired
 	private StaffAssemebler assemebler;
+//
+//	{
+//		Staff admin = new Staff();
+//		admin.setFirstName("ADMIN");
+//		admin.setLastName("ADMIN");
+//		admin.setRoleId(1);
+//		admin.setEmpId(0);
+//		admin.setPassword("Welcome@123");
+//		admin.setAttempt(0);
+//		admin.setEmail("admin@admin");
+//		staffService.save(admin);
+//	}
 
 	@GetMapping("/employees")
 	public CollectionModel<EntityModel<Staff>> all() {

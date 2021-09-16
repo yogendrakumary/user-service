@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ct.user.model.Staff;
 
-public interface StaffService {
+public interface StaffService extends UserService {
 
 	Staff save(Staff staff);
 

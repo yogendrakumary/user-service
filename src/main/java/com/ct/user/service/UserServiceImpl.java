@@ -1,26 +1,32 @@
 package com.ct.user.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ct.user.model.FinalVariables;
 import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.model.User;
+import com.ct.user.model.UserDto;
 import com.ct.user.repo.UserRepository;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
 
 	@Override
-	public List<User> getAllUserFromPatient(List<Patient> patients) {
+	public List<UserDto> getAllUserFromPatient(List<Patient> patients) {
 		return patients.stream().map(patient -> {
-			User user = new User();
+			UserDto user = new UserDto();
 			user.setTitle(patient.getTitle());
 			user.setFirstName(patient.getFirstName());
 			user.setLastName(patient.getLastName());
@@ -31,9 +37,9 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> getAllUserFromStaff(List<Staff> staffs) {
+	public List<UserDto> getAllUserFromStaff(List<Staff> staffs) {
 		return staffs.stream().map(patient -> {
-			User user = new User();
+			UserDto user = new UserDto();
 			user.setTitle(patient.getTitle());
 			user.setFirstName(patient.getFirstName());
 			user.setLastName(patient.getLastName());
@@ -44,21 +50,104 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> getAllUsers() {
-		return userRepository.allUsers();
+	public List<UserDto> getAllUsers() {
+
+		return userRepository.allUsers().stream().map(this::mapUserToUserDto).collect(Collectors.toList());
+	}
+
+	private UserDto mapUserToUserDto(User user) {
+		UserDto dto = new UserDto();
+
+		dto.setTitle(user.getTitle());
+		dto.setFirstName(user.getFirstName());
+		dto.setLastName(user.getLastName());
+		dto.setEmail(user.getEmail());
+		dto.setAttempt(user.getAttempt());
+		dto.setBirthDate(user.getBirthDate());
+
+		if (user instanceof Staff) {
+			dto.setRoleId(((Staff) user).getRoleId());
+			dto.setEmpId(((Staff) user).getEmpId());
+		} else if (user instanceof Patient) {
+			dto.setRoleId(FinalVariables.PATIENT);
+		}
+
+		return dto;
 	}
 
 	@Override
-	public User authenicate(User user) {
-		if (user != null && !user.getEmail().isEmpty() && !user.getPassword().isEmpty())
-			return userRepository.authenticate(user.getEmail(), user.getPassword());
+	public Optional<UserDto> authenticate(UserDto userDto) {
 
-		return null;
+		if (userDto != null && !userDto.getEmail().isBlank() && !userDto.getPassword().isBlank()) {
+			Optional<User> optional = userRepository.authenticate(userDto.getEmail(), userDto.getPassword());
+
+			if (optional.isPresent()) {
+				User user = optional.get();
+				UserDto responseUserDto = this.mapUserToUserDto(user);
+				log.info("USER : " + user);
+				log.info("Type Of Object : " + user.getClass());
+				return Optional.of(responseUserDto);
+			}
+		}
+
+		return Optional.empty();
 	}
 
 	@Override
-	public User updateCredentials(User user) {
+	public Optional<UserDto> resetUser(UserDto userDto) {
+		if (userDto != null && !userDto.getEmail().isBlank()) {
+			Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
+			if (optional.isPresent()) {
 
-		return null;
+				// Generating token or otp to login
+
+				// Sending mail with link to forget
+
+				User user = optional.get();
+				UserDto responseUserDto = this.mapUserToUserDto(user);
+
+				return Optional.of(responseUserDto);
+			}
+		}
+		return Optional.empty();
 	}
-}
+
+	@Override
+	public Optional<UserDto> updateCredentials(UserDto userDto) {
+
+		if (userDto == null)
+			return Optional.empty();
+
+		if (!userDto.getEmail().isBlank() && !userDto.getNewPassword().isBlank()) {
+			Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
+
+			if (optional.isPresent()) {
+				User user = optional.get();
+				UserDto responseUserDto = this.mapUserToUserDto(user);
+
+				String newPassoword = userDto.getNewPassword();
+				String oldPassword = user.getPassword();
+
+				// To Verify that old password is matching other wise don't change password
+				if (!userDto.getOldPassword().isBlank()) {
+
+					// To verify old password is matching with user entered old password
+					if (!userDto.getOldPassword().equals(oldPassword)) {
+						return Optional.empty();
+					}
+
+					// new Password should not match old password
+					if (newPassoword.equals(oldPassword)) {
+						return Optional.empty();
+					}
+				}
+				user.setPassword(newPassoword);
+
+				userRepository.save(user);
+
+				return Optional.of(responseUserDto);
+			}
+		}
+		return Optional.empty();
+	}
+};

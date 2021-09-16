@@ -1,21 +1,24 @@
 package com.ct.user.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
-import com.ct.user.model.User;
+import com.ct.user.model.UserDto;
 
 public interface UserService {
 
-	List<User> getAllUserFromPatient(List<Patient> patients);
+	List<UserDto> getAllUserFromPatient(List<Patient> patients);
 
-	List<User> getAllUserFromStaff(List<Staff> staffs);
+	List<UserDto> getAllUserFromStaff(List<Staff> staffs);
 
-	List<User> getAllUsers();
+	List<UserDto> getAllUsers();
 
-	User authenicate(User user);
+	Optional<UserDto> authenticate(UserDto user);
 
-	User updateCredentials(User user);
+	Optional<UserDto> updateCredentials(UserDto user);
+
+	Optional<UserDto> resetUser(UserDto user);
 
 }

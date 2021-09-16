@@ -1,8 +1,12 @@
 package com.ct.user.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ct.user.assembler.PatientAssembler;
 import com.ct.user.model.Patient;
 import com.ct.user.service.PatientService;
 
@@ -28,24 +33,30 @@ public class PatientController {
 	@Autowired
 	private PatientService patientService;
 
+	@Autowired
+	private PatientAssembler assembler;
+
 	@GetMapping("/patients")
-	public List<Patient> all() {
-		return patientService.getAllPatients();
+	public CollectionModel<EntityModel<Patient>> all() {
+		List<EntityModel<Patient>> patients = patientService.getAllPatients().stream().map(assembler::toModel)
+				.collect(Collectors.toList());
+		return CollectionModel.of(patients,
+				WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(PatientController.class).all()).withSelfRel());
 	}
 
 	@PostMapping("/patients")
-	public Patient newPatient(@RequestBody Patient patient) {
-		return patientService.save(patient);
+	public EntityModel<Patient> newPatient(@RequestBody Patient patient) {
+		return assembler.toModel(patientService.save(patient));
 	}
 
 	@GetMapping("/patients/{id}")
-	public Patient one(@PathVariable long id) {
-		return patientService.getPatient(id);
+	public EntityModel<Patient> one(@PathVariable long id) {
+		return assembler.toModel(patientService.getPatient(id));
 	}
 
 	@PutMapping("/patients/{id}")
-	public Patient replacePatient(@PathVariable long id, @RequestBody Patient patient) {
-		return patientService.updatePatient(id, patient);
+	public EntityModel<Patient> replacePatient(@PathVariable long id, @RequestBody Patient patient) {
+		return assembler.toModel(patientService.updatePatient(id, patient));
 	}
 
 	@DeleteMapping("/patients/{id}")

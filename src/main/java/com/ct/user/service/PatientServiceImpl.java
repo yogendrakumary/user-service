@@ -10,14 +10,27 @@ import com.ct.user.model.Patient;
 import com.ct.user.repo.PatientRepository;
 
 @Service
-public class PatientServiceImpl implements PatientService {
+public class PatientServiceImpl extends UserServiceImpl implements PatientService {
 
 	@Autowired
 	private PatientRepository patientRepository;
 
 	@Override
 	public Patient save(Patient patient) {
-		return patientRepository.save(patient);
+		Patient newPatient = new Patient();
+
+		newPatient.setTitle(patient.getTitle());
+		newPatient.setFirstName(patient.getFirstName());
+		newPatient.setLastName(patient.getLastName());
+		newPatient.setEmail(patient.getEmail());
+		newPatient.setBirthDate(patient.getBirthDate());
+		newPatient.setPassword(patient.getPassword());
+		newPatient.setContactNo(patient.getContactNo());
+
+		newPatient.setAttempt(0);
+		newPatient.setActive(true);
+
+		return patientRepository.save(newPatient);
 	}
 
 	@Override
@@ -33,9 +46,13 @@ public class PatientServiceImpl implements PatientService {
 	@Override
 	public Patient updatePatient(long id, Patient patient) {
 		Patient dbPatient = patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
-		dbPatient.setPatientId(id);
+//		dbPatient.setPatientId(id);
+		dbPatient.setTitle(patient.getTitle());
 		dbPatient.setFirstName(patient.getFirstName());
 		dbPatient.setLastName(patient.getLastName());
+		dbPatient.setEmail(patient.getEmail());
+		dbPatient.setBirthDate(patient.getBirthDate());
+
 		patientRepository.save(dbPatient);
 		return dbPatient;
 	}
