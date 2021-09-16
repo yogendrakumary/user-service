@@ -45,7 +45,7 @@ public class User {
 	private String email;
 	private java.sql.Date birthDate;
 
-	private String contactNo;
+	private Integer contactNo;
 
 	private String password;
 
@@ -55,7 +55,7 @@ public class User {
 
 	private boolean deleted;
 
-	private boolean active;
+	private String status;
 
 	@CreationTimestamp
 	private java.util.Date createdOn;

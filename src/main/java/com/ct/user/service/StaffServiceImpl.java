@@ -62,7 +62,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		Staff dbStaff = this.getStaff(id);
 
 		dbStaff.setDeleted(true);
-		dbStaff.setActive(false);
+//		dbStaff.setActive(false);
 
 		staffRepository.save(dbStaff);
 	}

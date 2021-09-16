@@ -28,7 +28,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		newPatient.setContactNo(patient.getContactNo());
 
 		newPatient.setAttempt(0);
-		newPatient.setActive(true);
+//		newPatient.setActive(true);
 
 		return patientRepository.save(newPatient);
 	}
@@ -62,7 +62,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		Patient dbPatient = this.getPatient(id);
 
 		dbPatient.setDeleted(true);
-		dbPatient.setActive(false);
+//		dbPatient.setActive(false);
 
 		patientRepository.save(dbPatient);
 
