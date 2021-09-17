@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import com.ct.user.model.Role;
 import com.ct.user.repo.RoleRepository;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class RolesServiceImpl implements RolesService {
 
 	@Autowired
@@ -16,6 +19,7 @@ public class RolesServiceImpl implements RolesService {
 
 	@Override
 	public List<Role> getAllRoles() {
+		log.info("Inside getAllRoles");
 		return repository.findAll();
 	}
 }

@@ -15,7 +15,7 @@ public class StaffAssemebler implements RepresentationModelAssembler<Staff, Enti
 	public EntityModel<Staff> toModel(Staff staff) {
 
 		return EntityModel.of(staff,
-				WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(StaffController.class).one(staff.getStaffId()))
+				WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(StaffController.class).one(staff.getUserId()))
 						.withSelfRel(),
 				WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(StaffController.class).all()).withRel("employees"));
 	}
