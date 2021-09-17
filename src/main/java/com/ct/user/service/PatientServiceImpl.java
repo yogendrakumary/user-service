@@ -9,7 +9,10 @@ import com.ct.user.exception.PatientNotFoundException;
 import com.ct.user.model.Patient;
 import com.ct.user.repo.PatientRepository;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class PatientServiceImpl extends UserServiceImpl implements PatientService {
 
 	@Autowired
@@ -17,6 +20,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 	@Override
 	public Patient save(Patient patient) {
+		log.info("INSIDE save");
 		Patient newPatient = new Patient();
 
 		newPatient.setTitle(patient.getTitle());
@@ -35,16 +39,20 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 	@Override
 	public List<Patient> getAllPatients() {
+		log.info("Inside getAllPatients");
 		return patientRepository.findAll();
 	}
 
 	@Override
 	public Patient getPatient(long id) {
+		log.info("Inside getPatient");
 		return patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
 	}
 
 	@Override
 	public Patient updatePatient(long id, Patient patient) {
+		log.info("Inside updatePatient");
+
 		Patient dbPatient = patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
 //		dbPatient.setPatientId(id);
 		dbPatient.setTitle(patient.getTitle());
@@ -59,6 +67,8 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 	@Override
 	public void disablePatient(long id) {
+		log.info("Inside disablePatient");
+
 		Patient dbPatient = this.getPatient(id);
 
 		dbPatient.setDeleted(true);

@@ -29,8 +29,8 @@ public class AuthController {
 
 	@PostMapping("/verify")
 	public ResponseEntity<?> authenticate(@RequestBody UserDto user) {
-		System.out.println("INSIDE authenticate ");
-		System.out.println(user);
+		log.info("INSIDE Authenticate");
+
 		Optional<UserDto> optional = userServiceImpl.authenticate(user);
 		if (optional.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -38,7 +38,6 @@ public class AuthController {
 		}
 
 		UserDto authenticatedUser = optional.get();
-		System.out.println(authenticatedUser);
 		return ResponseEntity.created(WebMvcLinkBuilder
 				.linkTo(WebMvcLinkBuilder.methodOn(AuthController.class).authenticate(authenticatedUser)).toUri())
 				.body(authenticatedUser);
@@ -46,7 +45,7 @@ public class AuthController {
 
 	@PostMapping("/forget")
 	public ResponseEntity<?> forget(@RequestBody UserDto user) {
-		System.out.println(user);
+		log.info("INSIDE forget");
 
 		if (user.getEmail().isBlank()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -65,8 +64,7 @@ public class AuthController {
 
 	@PostMapping("/update")
 	public ResponseEntity<?> update(@RequestBody UserDto user) {
-		log.info("INSIDE UPDATE");
-		log.info("User : " + user);
+		log.info("INSIDE update");
 
 		Optional<UserDto> optional = userServiceImpl.updateCredentials(user);
 		if (optional.isEmpty()) {

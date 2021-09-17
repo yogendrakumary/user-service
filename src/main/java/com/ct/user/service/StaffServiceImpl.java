@@ -9,7 +9,10 @@ import com.ct.user.exception.StaffNotFoundException;
 import com.ct.user.model.Staff;
 import com.ct.user.repo.StaffRepository;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Autowired
@@ -17,6 +20,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Override
 	public Staff save(Staff staff) {
+		log.info("Inside save");
 
 		Staff newStaff = new Staff();
 
@@ -38,16 +42,22 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Override
 	public List<Staff> getAllStaffDetails() {
+		log.info("Inside getAllStaffDetails");
+
 		return staffRepository.findAll();
 	}
 
 	@Override
 	public Staff getStaff(long id) {
+		log.info("Inside getStaff");
+
 		return staffRepository.findById(id).orElseThrow(() -> new StaffNotFoundException());
 	}
 
 	@Override
 	public Staff updateStaff(long id, Staff updatedStaff) {
+		log.info("Inside updateStaff");
+
 		Staff dbStaff = this.getStaff(id);
 
 		dbStaff.setFirstName(updatedStaff.getFirstName());
@@ -59,6 +69,8 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Override
 	public void disableStaff(long id) {
+		log.info("Inside disableStaff");
+
 		Staff dbStaff = this.getStaff(id);
 
 		dbStaff.setDeleted(true);

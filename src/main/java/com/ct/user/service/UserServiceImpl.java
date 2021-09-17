@@ -25,6 +25,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserDto> getAllUserFromPatient(List<Patient> patients) {
+		log.info("INSIDE getAllUserFromPatient");
+
 		return patients.stream().map(patient -> {
 			UserDto user = new UserDto();
 			user.setTitle(patient.getTitle());
@@ -38,6 +40,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserDto> getAllUserFromStaff(List<Staff> staffs) {
+		log.info("INSIDE getAllUserFromStaff");
+
 		return staffs.stream().map(patient -> {
 			UserDto user = new UserDto();
 			user.setTitle(patient.getTitle());
@@ -51,11 +55,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<UserDto> getAllUsers() {
+		log.info("INSIDE getAllUsers");
 
 		return userRepository.allUsers().stream().map(this::mapUserToUserDto).collect(Collectors.toList());
 	}
 
 	private UserDto mapUserToUserDto(User user) {
+		log.info("INSIDE mapUserToUserDto");
+
 		UserDto dto = new UserDto();
 
 		dto.setTitle(user.getTitle());
@@ -77,6 +84,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Optional<UserDto> authenticate(UserDto userDto) {
+		log.info("INSIDE authenticate");
 
 		if (userDto != null && !userDto.getEmail().isBlank() && !userDto.getPassword().isBlank()) {
 			Optional<User> optional = userRepository.authenticate(userDto.getEmail(), userDto.getPassword());
@@ -95,6 +103,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Optional<UserDto> resetUser(UserDto userDto) {
+		log.info("INSIDE resetUser");
+
 		if (userDto != null && !userDto.getEmail().isBlank()) {
 			Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
 			if (optional.isPresent()) {
@@ -114,6 +124,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Optional<UserDto> updateCredentials(UserDto userDto) {
+		log.info("INSIDE updateCredentials");
 
 		if (userDto == null)
 			return Optional.empty();
