@@ -32,6 +32,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		newPatient.setContactNo(patient.getContactNo());
 
 		newPatient.setAttempt(0);
+
 //		newPatient.setActive(true);
 
 		return patientRepository.save(newPatient);
