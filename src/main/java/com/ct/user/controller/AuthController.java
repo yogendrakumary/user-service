@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mediatype.problem.Problem;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ct.user.model.FinalVariables;
 import com.ct.user.model.UserDto;
 import com.ct.user.service.UserService;
 
@@ -31,29 +31,37 @@ public class AuthController {
 	public ResponseEntity<?> authenticate(@RequestBody UserDto user) {
 		log.info("INSIDE Authenticate");
 
-		Optional<UserDto> optional = userServiceImpl.authenticate(user);
-		if (optional.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body(Problem.create().withTitle("Invalid Login").withDetail("Email or Passoword is Mismatch"));
+		Optional<UserDto> optional = Optional.empty();
+
+		if (user != null && !user.getEmail().trim().isEmpty() && !user.getPassword().trim().isEmpty()) {
+			optional = userServiceImpl.authenticate(user);
+
+			if (optional.isPresent()) {
+				UserDto authenticatedUser = optional.get();
+
+				if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
+					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticatedUser);
+				}
+
+				return ResponseEntity.status(HttpStatus.CREATED).body(authenticatedUser);
+			}
 		}
 
-		UserDto authenticatedUser = optional.get();
-		return ResponseEntity.created(WebMvcLinkBuilder
-				.linkTo(WebMvcLinkBuilder.methodOn(AuthController.class).authenticate(authenticatedUser)).toUri())
-				.body(authenticatedUser);
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(Problem.create().withTitle("No User Found").withDetail("No User found with given email Id"));
 	}
 
 	@PostMapping("/forget")
 	public ResponseEntity<?> forget(@RequestBody UserDto user) {
 		log.info("INSIDE forget");
 
-		if (user.getEmail().isBlank()) {
+		if (user.getEmail().trim().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
 					Problem.create().withTitle("Email Id is Blank").withDetail("Blank Email Id Not been accepted."));
 		}
 
 		Optional<UserDto> optional = userServiceImpl.resetUser(user);
-		if (optional.isEmpty()) {
+		if (!optional.isPresent()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(Problem.create().withTitle("No User Found associated with Email ID")
 							.withDetail("Email Id not matched with any of registered user."));
@@ -67,7 +75,7 @@ public class AuthController {
 		log.info("INSIDE update");
 
 		Optional<UserDto> optional = userServiceImpl.updateCredentials(user);
-		if (optional.isEmpty()) {
+		if (!optional.isPresent()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(Problem.create().withTitle("Passoword Errors").withDetail("Issue while updating password"));
 		}

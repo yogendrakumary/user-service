@@ -96,16 +96,28 @@ public class UserServiceImpl implements UserService {
 	public Optional<UserDto> authenticate(UserDto userDto) {
 		log.info("INSIDE authenticate");
 
-		if (userDto != null && !userDto.getEmail().isBlank() && !userDto.getPassword().isBlank()) {
-			Optional<User> optional = userRepository.authenticate(userDto.getEmail(), userDto.getPassword());
+//			Optional<User> optional = userRepository.authenticate(userDto.getEmail(), userDto.getPassword());
+		Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
 
-			if (optional.isPresent()) {
-				User user = optional.get();
-				UserDto responseUserDto = this.mapUserToUserDto(user);
-				log.info("USER : " + user);
-				log.info("Type Of Object : " + user.getClass());
-				return Optional.of(responseUserDto);
+		if (optional.isPresent()) {
+			User user = optional.get();
+			UserDto responseUserDto = null;
+
+			if (user.getAttempt() >= FinalVariables.MAX_ATTEMPT || !userDto.getPassword().equals(user.getPassword())) {
+				// If incorrect increment attempt and persist
+				user.setAttempt(user.getAttempt() + 1);
+				userRepository.save(user);
+
+				// Setting only limited Details
+				responseUserDto = new UserDto();
+				responseUserDto.setEmail(user.getEmail());
+				responseUserDto.setAttempt(user.getAttempt());
+			} else if (userDto.getPassword().equals(user.getPassword())) {
+				// Check Password is correct
+				responseUserDto = this.mapUserToUserDto(user);
 			}
+
+			return Optional.of(responseUserDto);
 		}
 
 		return Optional.empty();
@@ -115,7 +127,7 @@ public class UserServiceImpl implements UserService {
 	public Optional<UserDto> resetUser(UserDto userDto) {
 		log.info("INSIDE resetUser");
 
-		if (userDto != null && !userDto.getEmail().isBlank()) {
+		if (userDto != null && !userDto.getEmail().trim().isEmpty()) {
 			Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
 			if (optional.isPresent()) {
 
@@ -139,7 +151,7 @@ public class UserServiceImpl implements UserService {
 		if (userDto == null)
 			return Optional.empty();
 
-		if (!userDto.getEmail().isBlank() && !userDto.getNewPassword().isBlank()) {
+		if (!userDto.getEmail().trim().isEmpty() && !userDto.getNewPassword().trim().isEmpty()) {
 			Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
 
 			if (optional.isPresent()) {
@@ -150,7 +162,7 @@ public class UserServiceImpl implements UserService {
 				String oldPassword = user.getPassword();
 
 				// To Verify that old password is matching other wise don't change password
-				if (!userDto.getOldPassword().isBlank()) {
+				if (!userDto.getOldPassword().trim().isEmpty()) {
 
 					// To verify old password is matching with user entered old password
 					if (!userDto.getOldPassword().equals(oldPassword)) {
