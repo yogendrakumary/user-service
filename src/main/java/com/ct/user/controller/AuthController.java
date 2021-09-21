@@ -3,7 +3,6 @@ package com.ct.user.controller;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.mediatype.problem.Problem;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,8 +46,9 @@ public class AuthController {
 			}
 		}
 
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-				.body(Problem.create().withTitle("No User Found").withDetail("No User found with given email Id"));
+//		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//				.body(Problem.create().withTitle("No User Found").withDetail("No User found with given email Id"));
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{}");
 	}
 
 	@PostMapping("/forget")
@@ -56,15 +56,17 @@ public class AuthController {
 		log.info("INSIDE forget");
 
 		if (user.getEmail().trim().isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					Problem.create().withTitle("Email Id is Blank").withDetail("Blank Email Id Not been accepted."));
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+//					Problem.create().withTitle("Email Id is Blank").withDetail("Blank Email Id Not been accepted."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
 		}
 
 		Optional<UserDto> optional = userServiceImpl.resetUser(user);
 		if (!optional.isPresent()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(Problem.create().withTitle("No User Found associated with Email ID")
-							.withDetail("Email Id not matched with any of registered user."));
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//					.body(Problem.create().withTitle("No User Found associated with Email ID")
+//							.withDetail("Email Id not matched with any of registered user."));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
 		}
 
 		return new ResponseEntity<>(optional.get(), HttpStatus.OK);
@@ -76,8 +78,9 @@ public class AuthController {
 
 		Optional<UserDto> optional = userServiceImpl.updateCredentials(user);
 		if (!optional.isPresent()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(Problem.create().withTitle("Passoword Errors").withDetail("Issue while updating password"));
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//					.body(Problem.create().withTitle("Passoword Errors").withDetail("Issue while updating password"));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{}");
 		}
 
 		return new ResponseEntity<>(optional.get(), HttpStatus.OK);

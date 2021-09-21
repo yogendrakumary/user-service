@@ -29,7 +29,6 @@ import lombok.ToString;
 public class User {
 
 	@Id
-//	@GeneratedValue(strategy = GenerationType.AUTO)
 	@SequenceGenerator(name = "myKeySeq", sequenceName = "user_sequences ", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "myKeySeq")
 	private Long userId;

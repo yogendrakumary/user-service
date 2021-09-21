@@ -23,6 +23,8 @@ public class Staff extends User {
 	@NotNull(message = "Please select a valid role.")
 	private Integer roleId;
 
+//	@SequenceGenerator(name = "empSeq", sequenceName = "emp_sequences	 ", allocationSize = 1)
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "empSeq")
 	private Integer empId;
 
 //	private String title;

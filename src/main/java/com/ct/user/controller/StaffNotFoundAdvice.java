@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.ct.user.exception.StaffNotFoundException;
 
+import lombok.extern.java.Log;
+
 @ControllerAdvice
 @ResponseBody
+@Log
 public class StaffNotFoundAdvice {
 
 	@ResponseStatus(code = HttpStatus.NOT_FOUND)
@@ -26,8 +29,8 @@ public class StaffNotFoundAdvice {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-		System.out.println("INSIDE validation Exception");
-		Map<String, String> errors = new HashMap();
+		log.info("INSIDE validation handleValidationExceptions");
+		Map<String, String> errors = new HashMap<>();
 		ex.getBindingResult().getAllErrors().forEach((error) -> {
 			String fieldName = ((FieldError) error).getField();
 			String errorMessage = error.getDefaultMessage();
