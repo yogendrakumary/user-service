@@ -21,6 +21,7 @@ public class UserDto {
 	private Integer attempt;
 
 	private int roleId;
+	private String roleName;
 	private int empId;
 
 	private String password;

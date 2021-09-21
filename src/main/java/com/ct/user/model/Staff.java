@@ -1,7 +1,9 @@
 package com.ct.user.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,8 +18,12 @@ public class Staff extends User {
 //	@GeneratedValue(strategy = GenerationType.IDENTITY)
 //	@Column(name = "staff_id")
 //	private long staffId;
-	private int roleId;
-	private int empId;
+
+	@Column(nullable = false)
+	@NotNull(message = "Please select a valid role.")
+	private Integer roleId;
+
+	private Integer empId;
 
 //	private String title;
 //	private String firstName;

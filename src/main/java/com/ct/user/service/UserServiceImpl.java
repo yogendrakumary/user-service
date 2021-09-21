@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ct.user.model.FinalVariables;
 import com.ct.user.model.Patient;
+import com.ct.user.model.Role;
 import com.ct.user.model.Staff;
 import com.ct.user.model.User;
 import com.ct.user.model.UserDto;
@@ -22,6 +23,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Autowired
+	private RolesService rolesService;
 
 	@Override
 	public List<UserDto> getAllUserFromPatient(List<Patient> patients) {
@@ -63,6 +67,8 @@ public class UserServiceImpl implements UserService {
 	private UserDto mapUserToUserDto(User user) {
 		log.info("INSIDE mapUserToUserDto");
 
+		List<Role> roles = rolesService.getAllRoles();
+
 		UserDto dto = new UserDto();
 
 		dto.setTitle(user.getTitle());
@@ -72,12 +78,16 @@ public class UserServiceImpl implements UserService {
 		dto.setAttempt(user.getAttempt());
 		dto.setBirthDate(user.getBirthDate());
 
+		int roleId = FinalVariables.PATIENT;
 		if (user instanceof Staff) {
-			dto.setRoleId(((Staff) user).getRoleId());
 			dto.setEmpId(((Staff) user).getEmpId());
-		} else if (user instanceof Patient) {
-			dto.setRoleId(FinalVariables.PATIENT);
+			roleId = ((Staff) user).getRoleId();
 		}
+
+		Role role = roles.get(roleId - 1);
+
+		dto.setRoleName(role.getRoleName());
+		dto.setRoleId(roleId);
 
 		return dto;
 	}

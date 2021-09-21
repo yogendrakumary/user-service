@@ -1,13 +1,11 @@
 package com.ct.user.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ct.user.assembler.StaffAssemebler;
 import com.ct.user.model.Staff;
 import com.ct.user.service.StaffService;
 
@@ -29,49 +26,39 @@ public class StaffController {
 	@Autowired
 	private StaffService staffService;
 
-	@Autowired
-	private StaffAssemebler assemebler;
-//
-//	{
-//		Staff admin = new Staff();
-//		admin.setFirstName("ADMIN");
-//		admin.setLastName("ADMIN");
-//		admin.setRoleId(1);
-//		admin.setEmpId(0);
-//		admin.setPassword("Welcome@123");
-//		admin.setAttempt(0);
-//		admin.setEmail("admin@admin");
-//		staffService.save(admin);
-//	}
-
 	@GetMapping("/employees")
-	public CollectionModel<EntityModel<Staff>> all() {
-		List<EntityModel<Staff>> staffs = staffService.getAllStaffDetails().stream().map(assemebler::toModel)
-				.collect(Collectors.toList());
+	public List<Staff> all() {
+		List<Staff> staffs = staffService.getAllStaffDetails();
 
-		return CollectionModel.of(staffs,
-				WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(StaffController.class).all()).withSelfRel());
+		return staffs;
 	}
 
 	@PostMapping("/employees")
-	public ResponseEntity<?> newStaff(@RequestBody Staff staff) {
-		EntityModel<Staff> entityModel = assemebler.toModel(staffService.save(staff));
-		return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+	public ResponseEntity<?> newStaff(@Valid @RequestBody Staff staff) {
+
+//		if (staff.getRoleId() == null) {
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Problem.create().withTitle("Roles Not Defined"));
+//		}
+
+		Staff entityModel = staffService.save(staff);
+
+//		return ResponseEntity.ok("User is valid");
+		return ResponseEntity.status(HttpStatus.CREATED).body(entityModel);
 	}
 
 	@GetMapping("/employees/{id}")
-	public EntityModel<Staff> one(@PathVariable long id) {
+	public Staff one(@PathVariable long id) {
 		Staff staff = staffService.getStaff(id);
 
-		return assemebler.toModel(staff);
+		return staff;
 	}
 
 	@PutMapping("/employees/{id}")
 	public ResponseEntity<?> replaceStaff(@PathVariable long id, @RequestBody Staff staff) {
 
-		EntityModel<Staff> entityModel = assemebler.toModel(staffService.updateStaff(id, staff));
+		Staff entityModel = staffService.updateStaff(id, staff);
 
-		return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
+		return ResponseEntity.status(HttpStatus.OK).body(entityModel);
 	}
 
 	@DeleteMapping("/employees/{id}")
