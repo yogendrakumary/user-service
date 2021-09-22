@@ -1,5 +1,6 @@
 package com.ct.user.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.ct.user.exception.StaffNotFoundException;
 import com.ct.user.model.Staff;
 import com.ct.user.repo.StaffRepository;
+import com.ct.user.repo.StaffRepositoryImpl;
 
 import lombok.extern.java.Log;
 
@@ -17,6 +19,8 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Autowired
 	private StaffRepository staffRepository;
+	@Autowired
+	private StaffRepositoryImpl customStaffRepo;
 
 	@Override
 	public Staff save(Staff staff) {
@@ -77,6 +81,22 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 //		dbStaff.setActive(false);
 
 		staffRepository.save(dbStaff);
+	}
+	@Override
+	public List<Long> getStaffCount() {
+		long totalEmployee = staffRepository.count();
+		long activeEmployee = customStaffRepo.countByStatus("active");
+		long deactiveEmployee = customStaffRepo.countByStatus("deactive");
+		deactiveEmployee += customStaffRepo.countByStatus("block");
+		
+		List<Long> countList = new ArrayList<>();
+		countList.add(totalEmployee);
+		countList.add(activeEmployee);
+		countList.add(deactiveEmployee);
+		for (Long count : countList) {
+			log.info(count.toString());
+		}
+		return countList;	
 	}
 
 }

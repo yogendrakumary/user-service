@@ -16,4 +16,8 @@ public interface PatientService extends UserService {
 
 	void disablePatient(long id);
 
+	List<Long> getPatientCount();
+
+	Patient editPatientStatus(Patient patient);
+
 }

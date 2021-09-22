@@ -20,7 +20,7 @@ import com.ct.user.model.Staff;
 import com.ct.user.service.StaffService;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin( "*")
 public class StaffController {
 
 	@Autowired
@@ -66,6 +66,10 @@ public class StaffController {
 		staffService.disableStaff(id);
 
 		return ResponseEntity.noContent().build();
+	}
+	@GetMapping("/employee/employeecount")
+	List<Long> employeeCount() {
+		return staffService.getStaffCount();
 	}
 
 }
