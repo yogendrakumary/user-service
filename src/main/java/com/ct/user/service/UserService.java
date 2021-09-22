@@ -5,20 +5,66 @@ import java.util.Optional;
 
 import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
+import com.ct.user.model.User;
 import com.ct.user.model.UserDto;
 
 public interface UserService {
 
+	/**
+	 * Only to Return All Patients
+	 * 
+	 * @param patients
+	 * @return
+	 */
 	List<UserDto> getAllUserFromPatient(List<Patient> patients);
 
+	/**
+	 * Only to Return All Staff
+	 * 
+	 * @param staffs
+	 * @return
+	 */
 	List<UserDto> getAllUserFromStaff(List<Staff> staffs);
 
+	/**
+	 * Return All the user from Staff and Patient
+	 * 
+	 * @return
+	 */
 	List<UserDto> getAllUsers();
 
-	Optional<UserDto> authenticate(UserDto user);
+	/**
+	 * To Authenticate the Staff
+	 * 
+	 * @param userDto
+	 * @param dbUser TODO
+	 * @return
+	 */
+	Optional<UserDto> authenticate(UserDto userDto, User dbUser);
 
-	Optional<UserDto> updateCredentials(UserDto user);
+	/**
+	 * Update the credentials
+	 * 
+	 * @param userDto
+	 * @param user TODO
+	 * @return
+	 */
+	Optional<UserDto> updateCredentials(UserDto userDto, User user);
 
-	Optional<UserDto> resetUser(UserDto user);
+	/**
+	 * To Reset User Credentials
+	 * 
+	 * @param user
+	 * @return
+	 */
+	Optional<UserDto> resetUser(User user);
+
+	/**
+	 * Returns Optional of User by searching with email
+	 * 
+	 * @param email
+	 * @return
+	 */
+	Optional<User> getUserByEmailId(String email);
 
 }

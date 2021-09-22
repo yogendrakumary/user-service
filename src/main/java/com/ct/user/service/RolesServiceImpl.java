@@ -1,6 +1,7 @@
 package com.ct.user.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,5 +22,10 @@ public class RolesServiceImpl implements RolesService {
 	public List<Role> getAllRoles() {
 		log.info("Inside getAllRoles");
 		return repository.findAll();
+	}
+
+	@Override
+	public Optional<Role> getRole(int roleId) {
+		return repository.findById(roleId);
 	}
 }
