@@ -1,20 +1,50 @@
 package com.ct.user.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.ct.user.model.Patient;
 
 public interface PatientService extends UserService {
 
+	/**
+	 * Returns All the patients
+	 * 
+	 * @return
+	 */
 	List<Patient> getAllPatients();
 
+	/**
+	 * Copy local Data to new model and persist that
+	 * 
+	 * @param patient
+	 * @return
+	 */
 	Patient save(Patient patient);
 
-	Patient getPatient(long id);
+	/**
+	 * Returns Patient From By Searching with User ID
+	 * 
+	 * @param id
+	 * @return
+	 */
+	Optional<Patient> getPatient(long id);
 
-	Patient updatePatient(long id, Patient patient);
+	/**
+	 * Update patient details with updated one
+	 * 
+	 * @param patient
+	 * @param dbPatient
+	 * @return
+	 */
+	Patient updatePatient(Patient patient, Patient dbPatient);
 
-	void disablePatient(long id);
+	/**
+	 * To change status of patient
+	 * 
+	 * @param dbPatient
+	 */
+	void disablePatient(Patient dbPatient);
 
 	List<Long> getPatientCount();
 

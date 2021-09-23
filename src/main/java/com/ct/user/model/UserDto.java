@@ -1,7 +1,5 @@
 package com.ct.user.model;
 
-import java.util.Date;
-
 import lombok.Data;
 import lombok.ToString;
 
@@ -16,15 +14,23 @@ public class UserDto {
 	private String email;
 	private String username;
 
-	private Date birthDate;
-	private long contactNo;
+	private java.sql.Date birthDate;
+	private String contactNo;
 	private Integer attempt;
 
 	private int roleId;
 	private String roleName;
 	private int empId;
 
+	private String race;
+	private String ethnicity;
+	private String languages;
+	private String address;
+
 	private String password;
 	private String oldPassword;
 	private String newPassword;
+
+	private java.util.Date createdOn;
+	private java.util.Date updatedOn;
 }
