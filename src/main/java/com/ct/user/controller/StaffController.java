@@ -16,11 +16,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.service.StaffService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @CrossOrigin( "*")
+@Slf4j
 public class StaffController {
 
 	@Autowired
@@ -70,6 +74,23 @@ public class StaffController {
 	@GetMapping("/employee/employeecount")
 	List<Long> employeeCount() {
 		return staffService.getStaffCount();
+	}
+	
+	/* this method is edit the employees Status 
+	 * it will received the list of employees
+	 * and send it the staff service
+	 * */
+	@PutMapping("employee/editstatus")
+	public ResponseEntity<?> editStaffStatus(@RequestBody List<Staff> EmployeeList ){
+		log.info("Inside User service Controller to edit status");
+		try {
+			staffService.editStaffStatus(EmployeeList);
+			return new ResponseEntity<Patient>(HttpStatus.OK);
+		}
+		
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }

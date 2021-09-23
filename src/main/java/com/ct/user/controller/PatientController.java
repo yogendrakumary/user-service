@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.model.Patient;
 import com.ct.user.service.PatientService;
+import com.sun.tools.sjavac.Log;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Mapping for Patient
@@ -27,6 +30,7 @@ import com.ct.user.service.PatientService;
  */
 @RestController
 @CrossOrigin(origins = "*")
+@Slf4j
 public class PatientController {
 
 	@Autowired
@@ -67,10 +71,11 @@ public class PatientController {
 		}
 	}
 	@PutMapping("patient/editstatus")
-	public ResponseEntity<?> editPatientStatus(@RequestBody Patient patient ){
-		
+	public ResponseEntity<?> editPatientStatus(@RequestBody List<Patient> patientList ){
+		log.info("Inside User service Controller to edit status");
 		try {
-			return new ResponseEntity<Patient>(patientService.editPatientStatus(patient),HttpStatus.OK);
+			patientService.editPatientStatus(patientList);
+			return new ResponseEntity<Patient>(HttpStatus.OK);
 		}
 		
 		catch(Exception e) {

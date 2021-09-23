@@ -99,4 +99,10 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		return countList;	
 	}
 
+	@Override
+	public void editStaffStatus(List<Staff> employeeList) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

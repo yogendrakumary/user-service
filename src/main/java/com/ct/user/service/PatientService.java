@@ -18,6 +18,6 @@ public interface PatientService extends UserService {
 
 	List<Long> getPatientCount();
 
-	Patient editPatientStatus(Patient patient);
+	void editPatientStatus(List<Patient> patientList);
 
 }

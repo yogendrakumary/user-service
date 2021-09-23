@@ -17,4 +17,6 @@ public interface StaffService extends UserService {
 	void disableStaff(long id);
 	List<Long> getStaffCount();
 
+	void editStaffStatus(List<Staff> employeeList);
+
 }

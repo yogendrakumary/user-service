@@ -102,11 +102,18 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		return countList;	
 	}
 
+
+
 	@Override
-	public Patient editPatientStatus(Patient patient) {
-		log.info("Patient Status edited....!");
-		patientRepository.save(patient);
-		return patientRepository.getById(patient.getUserId());
+	public void editPatientStatus(List<Patient> patientList) {
+		Patient obj = new Patient();
+		log.info("Inside User Service Mehod to edit status");
+		for (Patient patient : patientList) {
+			 obj = patientRepository.getById(patient.getUserId());
+				obj.setUserId(patient.getUserId());
+				obj.setStatus(patient.getStatus());	
+				patientRepository.save(obj);
+		}
 	}
 
 	
