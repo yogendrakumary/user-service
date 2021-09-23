@@ -2,11 +2,11 @@ package com.ct.user.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ct.user.exception.PatientNotFoundException;
 import com.ct.user.model.Patient;
 import com.ct.user.repo.PatientRepository;
 import com.ct.user.repo.PatientRepositoryImpl;
@@ -49,16 +49,15 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	}
 
 	@Override
-	public Patient getPatient(long id) {
+	public Optional<Patient> getPatient(long id) {
 		log.info("Inside getPatient");
-		return patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
+		return patientRepository.findById(id);
 	}
 
 	@Override
-	public Patient updatePatient(long id, Patient patient) {
+	public Patient updatePatient(Patient patient, Patient dbPatient) {
 		log.info("Inside updatePatient");
 
-		Patient dbPatient = patientRepository.findById(id).orElseThrow(() -> new PatientNotFoundException(id));
 //		dbPatient.setPatientId(id);
 		dbPatient.setTitle(patient.getTitle());
 		dbPatient.setFirstName(patient.getFirstName());
@@ -71,10 +70,8 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	}
 
 	@Override
-	public void disablePatient(long id) {
+	public void disablePatient(Patient dbPatient) {
 		log.info("Inside disablePatient");
-
-		Patient dbPatient = this.getPatient(id);
 
 		dbPatient.setDeleted(true);
 //		dbPatient.setActive(false);

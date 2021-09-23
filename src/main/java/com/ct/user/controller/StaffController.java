@@ -1,6 +1,7 @@
 package com.ct.user.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -16,57 +17,102 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ct.user.exception.StaffNotFoundException;
 import com.ct.user.model.Staff;
+import com.ct.user.model.User;
 import com.ct.user.service.StaffService;
 
+import lombok.extern.java.Log;
+
 @RestController
-@CrossOrigin( "*")
+@CrossOrigin(origins = "*")
+@Log
 public class StaffController {
 
 	@Autowired
 	private StaffService staffService;
 
+	/**
+	 * Returns all Employee Details
+	 * 
+	 * @return
+	 */
 	@GetMapping("/employees")
 	public List<Staff> all() {
-		List<Staff> staffs = staffService.getAllStaffDetails();
+		log.info("INSIDE all()");
 
-		return staffs;
+		return staffService.getAllStaffDetails();
 	}
 
+	/**
+	 * Validating Data and Sending to DB
+	 * 
+	 * @param newStaff
+	 * @return
+	 */
 	@PostMapping("/employees")
-	public ResponseEntity<?> newStaff(@Valid @RequestBody Staff staff) {
+	public ResponseEntity<?> newStaff(@Valid @RequestBody Staff newStaff) {
+		log.info("INSIDE newStaff()");
 
-//		if (staff.getRoleId() == null) {
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Problem.create().withTitle("Roles Not Defined"));
-//		}
+		// Need to verify email is already exists if exists send them user ecists with
+		// email id, you can forget
+		Optional<User> optional = staffService.getUserByEmailId(newStaff.getEmail());
+		if (optional.isPresent()) {
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Email Id Already Exist");
+		}
 
-		Staff entityModel = staffService.save(staff);
+		Staff dbStaff = staffService.save(newStaff);
 
-//		return ResponseEntity.ok("User is valid");
-		return ResponseEntity.status(HttpStatus.CREATED).body(entityModel);
+		return ResponseEntity.status(HttpStatus.CREATED).body(dbStaff);
 	}
 
+	/**
+	 * Return Staff Based on their ID
+	 * 
+	 * @param id
+	 * @return
+	 */
 	@GetMapping("/employees/{id}")
 	public Staff one(@PathVariable long id) {
-		Staff staff = staffService.getStaff(id);
+		log.info("INSIDE one()");
 
+		Staff staff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
 		return staff;
 	}
 
+	/**
+	 * Update Staff Details by searching with id and data send
+	 * 
+	 * @param id
+	 * @param staff
+	 * @return
+	 */
 	@PutMapping("/employees/{id}")
 	public ResponseEntity<?> replaceStaff(@PathVariable long id, @RequestBody Staff staff) {
+		log.info("INSIDE replaceStaff()");
 
-		Staff entityModel = staffService.updateStaff(id, staff);
+		Staff dbstaff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
+		dbstaff = staffService.updateStaff(staff, dbstaff);
 
-		return ResponseEntity.status(HttpStatus.OK).body(entityModel);
+		return ResponseEntity.status(HttpStatus.OK).body(dbstaff);
 	}
 
+	/**
+	 * Set the Deactivate Status
+	 * 
+	 * @param id
+	 * @return
+	 */
 	@DeleteMapping("/employees/{id}")
 	public ResponseEntity<?> removeStaff(@PathVariable long id) {
-		staffService.disableStaff(id);
+		log.info("INSIDE removeStaff()");
+
+		Staff dbstaff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
+		staffService.disableStaff(dbstaff);
 
 		return ResponseEntity.noContent().build();
 	}
+
 	@GetMapping("/employee/employeecount")
 	List<Long> employeeCount() {
 		return staffService.getStaffCount();

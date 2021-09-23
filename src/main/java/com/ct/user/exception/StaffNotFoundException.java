@@ -6,6 +6,10 @@ public class StaffNotFoundException extends RuntimeException {
 		super();
 	}
 
+	public StaffNotFoundException(String string) {
+		super(string);
+	}
+
 	public StaffNotFoundException(long id) {
 		super("Staff Not find by Id : " + id);
 	}

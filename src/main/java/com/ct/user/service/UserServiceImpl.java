@@ -67,8 +67,6 @@ public class UserServiceImpl implements UserService {
 	private UserDto mapUserToUserDto(User user) {
 		log.info("INSIDE mapUserToUserDto");
 
-		List<Role> roles = rolesService.getAllRoles();
-
 		UserDto dto = new UserDto();
 
 		dto.setTitle(user.getTitle());
@@ -83,105 +81,100 @@ public class UserServiceImpl implements UserService {
 			dto.setEmpId(((Staff) user).getEmpId());
 			roleId = ((Staff) user).getRoleId();
 		}
-
-		Role role = roles.get(roleId - 1);
-
-		dto.setRoleName(role.getRoleName());
+		// Might throw error
+		try {
+			Role role = rolesService.getRole(roleId).orElseThrow(() -> new Exception("Role Not Found"));
+			dto.setRoleName(role.getRoleName());
+		} catch (Exception e) {
+			log.info(e.getMessage());
+		}
 		dto.setRoleId(roleId);
 
 		return dto;
 	}
 
 	@Override
-	public Optional<UserDto> authenticate(UserDto userDto) {
+	public Optional<UserDto> authenticate(UserDto userDto, User user) {
 		log.info("INSIDE authenticate");
 
-//			Optional<User> optional = userRepository.authenticate(userDto.getEmail(), userDto.getPassword());
-		Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
+		UserDto responseUserDto = null;
+		Integer attempt = user.getAttempt();
 
-		if (optional.isPresent()) {
-			User user = optional.get();
-			UserDto responseUserDto = null;
+		// If Incorrect Password or Attempt exceeds
+		if (!userDto.getPassword().equals(user.getPassword()) || user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
 
-			if (user.getAttempt() >= FinalVariables.MAX_ATTEMPT || !userDto.getPassword().equals(user.getPassword())) {
-				// If incorrect increment attempt and persist
-				user.setAttempt(user.getAttempt() + 1);
-				userRepository.save(user);
+			// If incorrect increment attempt and persist
+			attempt += 1;
 
-				// Setting only limited Details
-				responseUserDto = new UserDto();
-				responseUserDto.setEmail(user.getEmail());
-				responseUserDto.setAttempt(user.getAttempt());
-			} else if (userDto.getPassword().equals(user.getPassword())) {
-				// Check Password is correct
-				responseUserDto = this.mapUserToUserDto(user);
+			// Setting only limited Details
+			responseUserDto = new UserDto();
+			responseUserDto.setEmail(user.getEmail());
+
+			responseUserDto.setAttempt(attempt);
+
+		} else if (userDto.getPassword().equals(user.getPassword())) {
+			// Check Password is correct
+
+			if (user.getAttempt() >= 0 && user.getAttempt() <= FinalVariables.MAX_ATTEMPT) {
+				// If login successful then reset Attempt
+				attempt = 0;
 			}
 
-			return Optional.of(responseUserDto);
+			responseUserDto = this.mapUserToUserDto(user);
 		}
 
-		return Optional.empty();
+		// If login successful then reset Attempt otherwise increment
+		user.setAttempt(attempt);
+		userRepository.save(user);
+
+		return Optional.of(responseUserDto);
 	}
 
 	@Override
-	public Optional<UserDto> resetUser(UserDto userDto) {
+	public Optional<User> getUserByEmailId(String email) {
+		return userRepository.findByEmailId(email);
+	}
+
+	@Override
+	public Optional<UserDto> resetUser(User user) {
 		log.info("INSIDE resetUser");
 
-		if (userDto != null && !userDto.getEmail().trim().isEmpty()) {
-			Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
-			if (optional.isPresent()) {
+		// Generating token or otp to login
 
-				// Generating token or otp to login
+		// Sending mail with link to forget
 
-				// Sending mail with link to forget
+		UserDto responseUserDto = this.mapUserToUserDto(user);
 
-				User user = optional.get();
-				UserDto responseUserDto = this.mapUserToUserDto(user);
-
-				return Optional.of(responseUserDto);
-			}
-		}
-		return Optional.empty();
+		return Optional.of(responseUserDto);
 	}
 
 	@Override
-	public Optional<UserDto> updateCredentials(UserDto userDto) {
+	public Optional<UserDto> updateCredentials(UserDto userDto, User user) {
 		log.info("INSIDE updateCredentials");
 
-		if (userDto == null)
-			return Optional.empty();
+		String newPassoword = userDto.getNewPassword();
+		String currentDbPassword = user.getPassword();
 
-		if (!userDto.getEmail().trim().isEmpty() && !userDto.getNewPassword().trim().isEmpty()) {
-			Optional<User> optional = userRepository.findByEmailId(userDto.getEmail());
+		if (user.getAttempt() != -1 && !userDto.getOldPassword().trim().isEmpty()) {
+			// To Verify that old password is matching other wise don't change password
+			// To verify old password is matching with user entered old password
+			if (!userDto.getOldPassword().equals(currentDbPassword)) {
+				return Optional.empty();
+			}
 
-			if (optional.isPresent()) {
-				User user = optional.get();
-				UserDto responseUserDto = this.mapUserToUserDto(user);
-
-				String newPassoword = userDto.getNewPassword();
-				String oldPassword = user.getPassword();
-
-				// To Verify that old password is matching other wise don't change password
-				if (!userDto.getOldPassword().trim().isEmpty()) {
-
-					// To verify old password is matching with user entered old password
-					if (!userDto.getOldPassword().equals(oldPassword)) {
-						return Optional.empty();
-					}
-
-					// new Password should not match old password
-					if (newPassoword.equals(oldPassword)) {
-						return Optional.empty();
-					}
-				}
-				user.setPassword(newPassoword);
-
-				userRepository.save(user);
-
-				return Optional.of(responseUserDto);
+			// new Password should not match old password
+			if (newPassoword.equals(currentDbPassword)) {
+				return Optional.empty();
 			}
 		}
-		return Optional.empty();
+
+		user.setPassword(newPassoword);
+		user.setAttempt(0); // To Reset Attempt when password update
+		user = userRepository.save(user);
+
+		UserDto responseUserDto = this.mapUserToUserDto(user);
+
+		return Optional.of(responseUserDto);
 	}
 
 };

@@ -2,11 +2,11 @@ package com.ct.user.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ct.user.exception.StaffNotFoundException;
 import com.ct.user.model.Staff;
 import com.ct.user.repo.StaffRepository;
 import com.ct.user.repo.StaffRepositoryImpl;
@@ -19,12 +19,16 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Autowired
 	private StaffRepository staffRepository;
+
 	@Autowired
 	private StaffRepositoryImpl customStaffRepo;
 
 	@Override
 	public Staff save(Staff staff) {
 		log.info("Inside save");
+
+		// TO fethc last empId
+		Integer lastEmpId = staffRepository.getLastEmployeeId().orElse(0);
 
 		Staff newStaff = new Staff();
 
@@ -33,9 +37,10 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		newStaff.setLastName(staff.getLastName());
 		newStaff.setEmail(staff.getEmail());
 		newStaff.setRoleId(staff.getRoleId());
-		newStaff.setPassword(staff.getPassword());
-		newStaff.setEmpId(staff.getEmpId());
 		newStaff.setBirthDate(staff.getBirthDate());
+
+		newStaff.setPassword(staff.getPassword());
+		newStaff.setEmpId(lastEmpId + 1);
 
 		newStaff.setAttempt(-1);
 
@@ -52,17 +57,15 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	}
 
 	@Override
-	public Staff getStaff(long id) {
+	public Optional<Staff> getStaff(long id) {
 		log.info("Inside getStaff");
 
-		return staffRepository.findById(id).orElseThrow(() -> new StaffNotFoundException());
+		return staffRepository.findById(id);
 	}
 
 	@Override
-	public Staff updateStaff(long id, Staff updatedStaff) {
+	public Staff updateStaff(Staff updatedStaff, Staff dbStaff) {
 		log.info("Inside updateStaff");
-
-		Staff dbStaff = this.getStaff(id);
 
 		dbStaff.setFirstName(updatedStaff.getFirstName());
 		dbStaff.setLastName(updatedStaff.getLastName());
@@ -72,23 +75,22 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	}
 
 	@Override
-	public void disableStaff(long id) {
+	public void disableStaff(Staff dbStaff) {
 		log.info("Inside disableStaff");
-
-		Staff dbStaff = this.getStaff(id);
 
 		dbStaff.setDeleted(true);
 //		dbStaff.setActive(false);
 
 		staffRepository.save(dbStaff);
 	}
+
 	@Override
 	public List<Long> getStaffCount() {
 		long totalEmployee = staffRepository.count();
 		long activeEmployee = customStaffRepo.countByStatus("active");
 		long deactiveEmployee = customStaffRepo.countByStatus("deactive");
 		deactiveEmployee += customStaffRepo.countByStatus("block");
-		
+
 		List<Long> countList = new ArrayList<>();
 		countList.add(totalEmployee);
 		countList.add(activeEmployee);
@@ -96,7 +98,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		for (Long count : countList) {
 			log.info(count.toString());
 		}
-		return countList;	
+		return countList;
 	}
 
 }
