@@ -60,7 +60,7 @@ public class PatientController {
 	public ResponseEntity<?> newPatient(@Valid @RequestBody Patient newPatient) {
 		log.info("INSIDE newPatient");
 
-		// Need to verify email is already exists if exists send them user ecists with
+		// Need to verify email is already exists if exists send them user exists with
 		// email id, you can forget
 		Optional<User> optional = patientService.getUserByEmailId(newPatient.getEmail());
 		if (optional.isPresent()) {

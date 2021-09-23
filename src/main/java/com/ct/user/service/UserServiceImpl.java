@@ -115,8 +115,10 @@ public class UserServiceImpl implements UserService {
 		} else if (userDto.getPassword().equals(user.getPassword())) {
 			// Check Password is correct
 
-			// If login successful then reset Attempt
-			attempt = 0;
+			if (user.getAttempt() >= 0 && user.getAttempt() <= FinalVariables.MAX_ATTEMPT) {
+				// If login successful then reset Attempt
+				attempt = 0;
+			}
 
 			responseUserDto = this.mapUserToUserDto(user);
 		}

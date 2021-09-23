@@ -47,7 +47,8 @@ public class AuthController {
 			if (optional.isPresent()) {
 				UserDto authenticatedUser = optional.get();
 
-				if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
+				if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT
+						|| authenticatedUser.getRoleId() == 0) {
 					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticatedUser);
 				}
 
