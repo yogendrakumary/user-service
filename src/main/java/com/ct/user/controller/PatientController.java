@@ -114,4 +114,24 @@ public class PatientController {
 
 		patientService.disablePatient(dbPatient);
 	}
+	@GetMapping("/patients/patientcount")
+	ResponseEntity<?> patientCount() {
+		try {
+			return new ResponseEntity<List<Long>>(patientService.getPatientCount(), HttpStatus.OK);
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	@PutMapping("patient/editstatus")
+	public ResponseEntity<?> editPatientStatus(@RequestBody Patient patient ){
+		
+		try {
+			return new ResponseEntity<Patient>(patientService.editPatientStatus(patient),HttpStatus.OK);
+		}
+		
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }

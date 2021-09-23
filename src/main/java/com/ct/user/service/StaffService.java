@@ -47,4 +47,6 @@ public interface StaffService extends UserService {
 	 */
 	void disableStaff(Staff dbStaff);
 
+	List<Long> getStaffCount();
+
 }

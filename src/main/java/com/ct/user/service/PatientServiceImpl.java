@@ -1,5 +1,6 @@
 package com.ct.user.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Patient;
 import com.ct.user.repo.PatientRepository;
+import com.ct.user.repo.PatientRepositoryImpl;
 
 import lombok.extern.java.Log;
 
@@ -17,6 +19,8 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 	@Autowired
 	private PatientRepository patientRepository;
+	@Autowired
+	private PatientRepositoryImpl customPatientRepo;
 
 	@Override
 	public Patient save(Patient patient) {
@@ -75,4 +79,32 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		patientRepository.save(dbPatient);
 
 	}
+
+
+
+	@Override
+	public List<Long> getPatientCount() {
+		long totalPatient = patientRepository.count();
+		long activePatient = customPatientRepo.countByStatus("active");
+		long deactivePatient = customPatientRepo.countByStatus("deactive");
+		deactivePatient += customPatientRepo.countByStatus("block");
+		
+		List<Long> countList = new ArrayList<>();
+		countList.add(totalPatient);
+		countList.add(activePatient);
+		countList.add(deactivePatient);
+		for (Long count : countList) {
+			log.info(count.toString());
+		}
+		return countList;	
+	}
+
+	@Override
+	public Patient editPatientStatus(Patient patient) {
+		log.info("Patient Status edited....!");
+		patientRepository.save(patient);
+		return patientRepository.getById(patient.getUserId());
+	}
+
+	
 }

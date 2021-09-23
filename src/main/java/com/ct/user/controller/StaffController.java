@@ -113,4 +113,9 @@ public class StaffController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@GetMapping("/employee/employeecount")
+	List<Long> employeeCount() {
+		return staffService.getStaffCount();
+	}
+
 }
