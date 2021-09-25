@@ -33,4 +33,6 @@ public class UserDto {
 
 	private java.util.Date createdOn;
 	private java.util.Date updatedOn;
+	
+	private String error;
 }

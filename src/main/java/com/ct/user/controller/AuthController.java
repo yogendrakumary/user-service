@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ct.user.exception.UserNotFoundException;
+import com.ct.user.exception.auth.EmailIdNotRegisteredException;
+import com.ct.user.exception.auth.PasswordMaxAttemptException;
+import com.ct.user.exception.auth.BlankPasswordException;
+import com.ct.user.exception.auth.PasswordNotVerifiedException;
+import com.ct.user.exception.auth.UserNotFoundException;
 import com.ct.user.model.FinalVariables;
 import com.ct.user.model.User;
 import com.ct.user.model.UserDto;
@@ -38,22 +42,31 @@ public class AuthController {
 	public ResponseEntity<?> authenticate(@RequestBody UserDto userDto) {
 		log.info("INSIDE Authenticate");
 
-		if (userDto != null && !userDto.getEmail().trim().isEmpty() && !userDto.getPassword().trim().isEmpty()) {
+		if (userDto == null) {
+			throw new UserNotFoundException();
+		}
 
-			User user = userServiceImpl.getUserByEmailId(userDto.getEmail()).orElseThrow(UserNotFoundException::new);
+		if (userDto.getPassword() == null || userDto.getPassword().trim().isEmpty()) {
+			throw new BlankPasswordException();
+		}
 
-			Optional<UserDto> optional = userServiceImpl.authenticate(userDto, user);
+		User user = userServiceImpl.getUserByEmailId(userDto.getEmail())
+				.orElseThrow(EmailIdNotRegisteredException::new);
 
-			if (optional.isPresent()) {
-				UserDto authenticatedUser = optional.get();
+		if (user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
+			throw new PasswordMaxAttemptException();
+		}
 
-				if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT
-						|| authenticatedUser.getRoleId() == 0) {
-					return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticatedUser);
-				}
+		Optional<UserDto> optional = userServiceImpl.authenticate(userDto, user);
 
-				return ResponseEntity.status(HttpStatus.CREATED).body(authenticatedUser);
+		if (optional.isPresent()) {
+			UserDto authenticatedUser = optional.get();
+
+			if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT || authenticatedUser.getRoleId() == 0) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticatedUser);
 			}
+
+			return ResponseEntity.ok().body(authenticatedUser);
 		}
 
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No User found with given email Id");
@@ -69,12 +82,12 @@ public class AuthController {
 	public ResponseEntity<?> forget(@RequestBody UserDto userDto) {
 		log.info("INSIDE forget");
 
-		if (userDto == null || userDto.getEmail().trim().isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Blank Email Id Not been accepted.");
+		if (userDto == null) {
+			throw new UserNotFoundException();
 		}
 
 		User user = userServiceImpl.getUserByEmailId(userDto.getEmail())
-				.orElseThrow(() -> new UserNotFoundException("User Not Registered with this Email ID"));
+				.orElseThrow(EmailIdNotRegisteredException::new);
 
 		userServiceImpl.resetUser(user);
 
@@ -91,17 +104,22 @@ public class AuthController {
 	public ResponseEntity<?> update(@RequestBody UserDto userDto) {
 		log.info("INSIDE update");
 
-		if (userDto == null || !userDto.getEmail().trim().isEmpty() || userDto.getNewPassword().trim().isEmpty())
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password should not be empty");
-
-		User user = userServiceImpl.getUserByEmailId(userDto.getEmail())
-				.orElseThrow(() -> new UserNotFoundException("User Not Found"));
-
-		Optional<UserDto> optional = userServiceImpl.updateCredentials(userDto, user);
-		if (!optional.isPresent()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Issue while updating password");
+		if (userDto == null) {
+			throw new UserNotFoundException();
 		}
 
-		return new ResponseEntity<>(optional.get(), HttpStatus.OK);
+		if (userDto.getNewPassword() == null || userDto.getNewPassword().trim().isEmpty())
+			throw new BlankPasswordException();
+
+		User user = userServiceImpl.getUserByEmailId(userDto.getEmail())
+				.orElseThrow(EmailIdNotRegisteredException::new);
+
+		Optional<UserDto> optional = userServiceImpl.updateCredentials(userDto, user);
+
+		if (optional.isPresent()) {
+			return ResponseEntity.ok(optional.get());
+		}
+
+		return ResponseEntity.badRequest().body("Issue While updating passoword");
 	}
 }

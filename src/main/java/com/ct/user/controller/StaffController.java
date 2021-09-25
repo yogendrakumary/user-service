@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.exception.StaffNotFoundException;
+import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
 import com.ct.user.model.Staff;
 import com.ct.user.model.User;
 import com.ct.user.service.StaffService;
@@ -54,16 +55,15 @@ public class StaffController {
 	public ResponseEntity<?> newStaff(@Valid @RequestBody Staff newStaff) {
 		log.info("INSIDE newStaff()");
 
-		// Need to verify email is already exists if exists send them user ecists with
+		// Need to verify email is already exists if exists send them user exists with
 		// email id, you can forget
-		Optional<User> optional = staffService.getUserByEmailId(newStaff.getEmail());
-		if (optional.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Email Id Already Exist");
-		}
+		staffService.getUserByEmailId(newStaff.getEmail()).ifPresent(s -> {
+			throw new EmailIdAlreadyRegisteredException();
+		});
 
 		Staff dbStaff = staffService.save(newStaff);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(dbStaff);
+		return ResponseEntity.ok(dbStaff);
 	}
 
 	/**
@@ -76,8 +76,7 @@ public class StaffController {
 	public Staff one(@PathVariable long id) {
 		log.info("INSIDE one()");
 
-		Staff staff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
-		return staff;
+		return staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
 	}
 
 	/**
@@ -94,7 +93,7 @@ public class StaffController {
 		Staff dbstaff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
 		dbstaff = staffService.updateStaff(staff, dbstaff);
 
-		return ResponseEntity.status(HttpStatus.OK).body(dbstaff);
+		return ResponseEntity.ok(dbstaff);
 	}
 
 	/**

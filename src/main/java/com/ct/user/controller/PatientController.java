@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.exception.PatientNotFoundException;
+import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
 import com.ct.user.model.Patient;
 import com.ct.user.model.User;
 import com.ct.user.service.PatientService;
@@ -62,10 +63,9 @@ public class PatientController {
 
 		// Need to verify email is already exists if exists send them user exists with
 		// email id, you can forget
-		Optional<User> optional = patientService.getUserByEmailId(newPatient.getEmail());
-		if (optional.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Email Id Already Exist");
-		}
+		patientService.getUserByEmailId(newPatient.getEmail()).ifPresent(u -> {
+			throw new EmailIdAlreadyRegisteredException();
+		});
 
 		Patient dbPatient = patientService.save(newPatient);
 
@@ -114,24 +114,25 @@ public class PatientController {
 
 		patientService.disablePatient(dbPatient);
 	}
+
 	@GetMapping("/patients/patientcount")
 	ResponseEntity<?> patientCount() {
 		try {
 			return new ResponseEntity<List<Long>>(patientService.getPatientCount(), HttpStatus.OK);
-		}
-		catch(Exception e) {
-			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	@PutMapping("patient/editstatus")
-	public ResponseEntity<?> editPatientStatus(@RequestBody Patient patient ){
-		
+	public ResponseEntity<?> editPatientStatus(@RequestBody Patient patient) {
+
 		try {
-			return new ResponseEntity<Patient>(patientService.editPatientStatus(patient),HttpStatus.OK);
+			return new ResponseEntity<Patient>(patientService.editPatientStatus(patient), HttpStatus.OK);
 		}
-		
-		catch(Exception e) {
-			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+
+		catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

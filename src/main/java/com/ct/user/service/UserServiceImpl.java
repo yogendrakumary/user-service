@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ct.user.exception.RoleNotFoundException;
+import com.ct.user.exception.auth.EmailIdNotRegisteredException;
+import com.ct.user.exception.auth.PasswordNotVerifiedException;
 import com.ct.user.model.FinalVariables;
 import com.ct.user.model.Patient;
 import com.ct.user.model.Role;
@@ -64,11 +67,12 @@ public class UserServiceImpl implements UserService {
 		return userRepository.allUsers().stream().map(this::mapUserToUserDto).collect(Collectors.toList());
 	}
 
-	private UserDto mapUserToUserDto(User user) {
+	private UserDto mapUserToUserDto(User user) throws RoleNotFoundException {
 		log.info("INSIDE mapUserToUserDto");
 
 		UserDto dto = new UserDto();
 
+		dto.setUserId(user.getUserId());
 		dto.setTitle(user.getTitle());
 		dto.setFirstName(user.getFirstName());
 		dto.setLastName(user.getLastName());
@@ -81,13 +85,10 @@ public class UserServiceImpl implements UserService {
 			dto.setEmpId(((Staff) user).getEmpId());
 			roleId = ((Staff) user).getRoleId();
 		}
-		// Might throw error
-		try {
-			Role role = rolesService.getRole(roleId).orElseThrow(() -> new Exception("Role Not Found"));
-			dto.setRoleName(role.getRoleName());
-		} catch (Exception e) {
-			log.info(e.getMessage());
-		}
+
+		Role role = rolesService.getRole(roleId).orElseThrow(RoleNotFoundException::new);
+		dto.setRoleName(role.getRoleName());
+
 		dto.setRoleId(roleId);
 
 		return dto;
@@ -105,11 +106,11 @@ public class UserServiceImpl implements UserService {
 
 			// If incorrect increment attempt and persist
 			attempt += 1;
+			user.setAttempt(attempt);
 
 			// Setting only limited Details
 			responseUserDto = new UserDto();
 			responseUserDto.setEmail(user.getEmail());
-
 			responseUserDto.setAttempt(attempt);
 
 		} else if (userDto.getPassword().equals(user.getPassword())) {
@@ -117,21 +118,22 @@ public class UserServiceImpl implements UserService {
 
 			if (user.getAttempt() >= 0 && user.getAttempt() <= FinalVariables.MAX_ATTEMPT) {
 				// If login successful then reset Attempt
-				attempt = 0;
+				user.setAttempt(0);
 			}
 
 			responseUserDto = this.mapUserToUserDto(user);
 		}
-
-		// If login successful then reset Attempt otherwise increment
-		user.setAttempt(attempt);
-		userRepository.save(user);
+		user = userRepository.save(user);
 
 		return Optional.of(responseUserDto);
 	}
 
 	@Override
-	public Optional<User> getUserByEmailId(String email) {
+	public Optional<User> getUserByEmailId(String email) throws EmailIdNotRegisteredException {
+		log.info("INSIDE getUserByEmailId");
+		if (email == null || email.trim().isEmpty()) {
+			throw new EmailIdNotRegisteredException("Blank Email Id Provided");
+		}
 		return userRepository.findByEmailId(email);
 	}
 
@@ -149,22 +151,28 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Optional<UserDto> updateCredentials(UserDto userDto, User user) {
+	public Optional<UserDto> updateCredentials(UserDto userDto, User user) throws PasswordNotVerifiedException {
 		log.info("INSIDE updateCredentials");
 
 		String newPassoword = userDto.getNewPassword();
 		String currentDbPassword = user.getPassword();
 
-		if (user.getAttempt() != -1 && !userDto.getOldPassword().trim().isEmpty()) {
+		if (user.getAttempt() != -1 ) {
+			
+			if(userDto.getOldPassword() == null || userDto.getOldPassword().trim().isEmpty()) {
+				throw new PasswordNotVerifiedException("Old Password is Blank");
+			}
 			// To Verify that old password is matching other wise don't change password
 			// To verify old password is matching with user entered old password
 			if (!userDto.getOldPassword().equals(currentDbPassword)) {
-				return Optional.empty();
+//				return Optional.empty();
+				throw new PasswordNotVerifiedException("Old Password is not matching");
 			}
 
 			// new Password should not match old password
 			if (newPassoword.equals(currentDbPassword)) {
-				return Optional.empty();
+//				return Optional.empty();
+				throw new PasswordNotVerifiedException("New Password is Same as Old Password");
 			}
 		}
 
