@@ -68,7 +68,7 @@ public class PatientController {
 
 		patientService.save(newPatient);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body("Employee Added Successfully");
+		return ResponseEntity.ok("Employee Added Successfully");
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class PatientController {
 		Patient dbPatient = patientService.getPatient(id).orElseThrow(() -> new PatientNotFoundException(id));
 		patientService.updatePatient(updatedPatient, dbPatient);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body("Patient Details Updated Successfully");
+		return ResponseEntity.ok("Patient Details Updated Successfully");
 	}
 
 	/**

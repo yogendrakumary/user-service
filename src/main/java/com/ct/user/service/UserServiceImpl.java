@@ -123,7 +123,8 @@ public class UserServiceImpl implements UserService {
 
 			responseUserDto = this.mapUserToUserDto(user);
 		}
-		user = userRepository.save(user);
+
+		userRepository.save(user);
 
 		return Optional.of(responseUserDto);
 	}
@@ -157,9 +158,9 @@ public class UserServiceImpl implements UserService {
 		String newPassoword = userDto.getNewPassword();
 		String currentDbPassword = user.getPassword();
 
-		if (user.getAttempt() != -1 ) {
-			
-			if(userDto.getOldPassword() == null || userDto.getOldPassword().trim().isEmpty()) {
+		if (user.getAttempt() != -1) {
+
+			if (userDto.getOldPassword() == null || userDto.getOldPassword().trim().isEmpty()) {
 				throw new PasswordNotVerifiedException("Old Password is Blank");
 			}
 			// To Verify that old password is matching other wise don't change password
@@ -185,4 +186,4 @@ public class UserServiceImpl implements UserService {
 		return Optional.of(responseUserDto);
 	}
 
-};
+}
