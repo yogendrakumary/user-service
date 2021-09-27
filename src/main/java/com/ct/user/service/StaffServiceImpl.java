@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Staff;
+import com.ct.user.model.UserDto;
 import com.ct.user.repo.StaffRepository;
 import com.ct.user.repo.StaffRepositoryImpl;
 
@@ -24,7 +25,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	private StaffRepositoryImpl customStaffRepo;
 
 	@Override
-	public Staff save(Staff staff) {
+	public Staff save(UserDto staff) {
 		log.info("Inside save");
 
 		// TO fethc last empId
@@ -64,12 +65,15 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	}
 
 	@Override
-	public Staff updateStaff(Staff updatedStaff, Staff dbStaff) {
+	public Staff updateStaff(UserDto updatedStaff, Staff dbStaff) {
 		log.info("Inside updateStaff");
 
+		dbStaff.setTitle(updatedStaff.getTitle());
 		dbStaff.setFirstName(updatedStaff.getFirstName());
 		dbStaff.setLastName(updatedStaff.getLastName());
-		dbStaff.setEmail(updatedStaff.getEmail());
+		dbStaff.setBirthDate(updatedStaff.getBirthDate());
+		dbStaff.setRoleId(updatedStaff.getRoleId());
+		dbStaff.setEmpId(updatedStaff.getEmpId());
 
 		return staffRepository.save(dbStaff);
 	}

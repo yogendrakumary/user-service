@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ct.user.exception.auth.BlankPasswordException;
 import com.ct.user.exception.auth.EmailIdNotRegisteredException;
 import com.ct.user.exception.auth.PasswordMaxAttemptException;
-import com.ct.user.exception.auth.BlankPasswordException;
-import com.ct.user.exception.auth.PasswordNotVerifiedException;
 import com.ct.user.exception.auth.UserNotFoundException;
 import com.ct.user.model.FinalVariables;
 import com.ct.user.model.User;

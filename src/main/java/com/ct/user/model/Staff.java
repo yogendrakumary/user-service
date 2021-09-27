@@ -20,7 +20,7 @@ public class Staff extends User {
 //	private long staffId;
 
 	@Column(nullable = false)
-	@NotNull(message = "Please select a valid role.")
+//	@NotNull(message = "Please select a valid role.")
 	private Integer roleId;
 
 //	@SequenceGenerator(name = "empSeq", sequenceName = "emp_sequences	 ", allocationSize = 1)

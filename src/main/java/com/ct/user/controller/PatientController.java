@@ -1,13 +1,11 @@
 package com.ct.user.controller;
 
 import java.util.List;
-import java.util.Optional;
-
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ct.user.exception.PatientNotFoundException;
 import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
 import com.ct.user.model.Patient;
-import com.ct.user.model.User;
+import com.ct.user.model.UserDto;
+import com.ct.user.model.validation.PatientInfo;
 import com.ct.user.service.PatientService;
 
 import lombok.extern.java.Log;
@@ -58,7 +57,7 @@ public class PatientController {
 	 * @return
 	 */
 	@PostMapping("/patients")
-	public ResponseEntity<?> newPatient(@Valid @RequestBody Patient newPatient) {
+	public ResponseEntity<String> newPatient(@Validated(value = PatientInfo.class) @RequestBody UserDto newPatient) {
 		log.info("INSIDE newPatient");
 
 		// Need to verify email is already exists if exists send them user exists with
@@ -67,9 +66,9 @@ public class PatientController {
 			throw new EmailIdAlreadyRegisteredException();
 		});
 
-		Patient dbPatient = patientService.save(newPatient);
+		patientService.save(newPatient);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(dbPatient);
+		return ResponseEntity.status(HttpStatus.CREATED).body("Employee Added Successfully");
 	}
 
 	/**
@@ -93,13 +92,13 @@ public class PatientController {
 	 * @return
 	 */
 	@PutMapping("/patients/{id}")
-	public ResponseEntity<?> replacePatient(@PathVariable long id, @RequestBody Patient updatedPatient) {
+	public ResponseEntity<String> replacePatient(@PathVariable long id, @RequestBody UserDto updatedPatient) {
 		log.info("INSIDE replacePatient");
 
 		Patient dbPatient = patientService.getPatient(id).orElseThrow(() -> new PatientNotFoundException(id));
-		dbPatient = patientService.updatePatient(updatedPatient, dbPatient);
+		patientService.updatePatient(updatedPatient, dbPatient);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(dbPatient);
+		return ResponseEntity.status(HttpStatus.CREATED).body("Patient Details Updated Successfully");
 	}
 
 	/**
@@ -116,9 +115,9 @@ public class PatientController {
 	}
 
 	@GetMapping("/patients/patientcount")
-	ResponseEntity<?> patientCount() {
+	public ResponseEntity<?> patientCount() {
 		try {
-			return new ResponseEntity<List<Long>>(patientService.getPatientCount(), HttpStatus.OK);
+			return new ResponseEntity<>(patientService.getPatientCount(), HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -128,7 +127,7 @@ public class PatientController {
 	public ResponseEntity<?> editPatientStatus(@RequestBody Patient patient) {
 
 		try {
-			return new ResponseEntity<Patient>(patientService.editPatientStatus(patient), HttpStatus.OK);
+			return new ResponseEntity<>(patientService.editPatientStatus(patient), HttpStatus.OK);
 		}
 
 		catch (Exception e) {
