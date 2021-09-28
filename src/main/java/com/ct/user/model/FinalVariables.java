@@ -1,6 +1,14 @@
 package com.ct.user.model;
 
+/**
+ * Constant Used in Application
+ * 
+ * @author YogendrakumarY
+ */
 public class FinalVariables {
+
+	private FinalVariables() {
+	}
 
 	public static final Integer ADMIN = 1;
 	public static final Integer PHYSICIAN = 2;

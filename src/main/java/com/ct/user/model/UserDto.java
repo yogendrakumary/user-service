@@ -45,10 +45,12 @@ public class UserDto {
 //	private String username;
 
 	@NotNull(message = "Please select a valid role.", groups = { EmployeeInfo.class })
-	private int roleId;
+	private Integer roleId;
 
 	private String roleName;
-	private int empId;
+
+	private Role role;
+	private Integer empId;
 
 	private String race;
 	private String ethnicity;
