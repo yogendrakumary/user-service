@@ -1,4 +1,4 @@
-package com.ct.user.controller;
+package com.ct.user.controller.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,7 +18,7 @@ import lombok.extern.java.Log;
 @ControllerAdvice
 @ResponseBody
 @Log
-public class StaffNotFoundAdvice {
+public class StaffControllerAdvice {
 
 	/**
 	 * when Staff not found

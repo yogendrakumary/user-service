@@ -1,9 +1,9 @@
-package com.ct.user.exception;
+package com.ct.user.exception.auth;
 
 public class UserNotFoundException extends RuntimeException {
 
 	public UserNotFoundException() {
-		super("User Not Found");
+		super("User Not Found in System");
 	}
 
 	public UserNotFoundException(String message) {

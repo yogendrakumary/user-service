@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Patient;
+import com.ct.user.model.UserDto;
 import com.ct.user.repo.PatientRepository;
 import com.ct.user.repo.PatientRepositoryImpl;
 
@@ -23,7 +24,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	private PatientRepositoryImpl customPatientRepo;
 
 	@Override
-	public Patient save(Patient patient) {
+	public Patient save(UserDto patient) {
 		log.info("INSIDE save");
 		Patient newPatient = new Patient();
 
@@ -36,8 +37,6 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		newPatient.setContactNo(patient.getContactNo());
 
 		newPatient.setAttempt(0);
-
-//		newPatient.setActive(true);
 
 		return patientRepository.save(newPatient);
 	}
@@ -55,14 +54,12 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	}
 
 	@Override
-	public Patient updatePatient(Patient patient, Patient dbPatient) {
+	public Patient updatePatient(UserDto patient, Patient dbPatient) {
 		log.info("Inside updatePatient");
 
-//		dbPatient.setPatientId(id);
 		dbPatient.setTitle(patient.getTitle());
 		dbPatient.setFirstName(patient.getFirstName());
 		dbPatient.setLastName(patient.getLastName());
-		dbPatient.setEmail(patient.getEmail());
 		dbPatient.setBirthDate(patient.getBirthDate());
 
 		patientRepository.save(dbPatient);
@@ -74,13 +71,10 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		log.info("Inside disablePatient");
 
 		dbPatient.setDeleted(true);
-//		dbPatient.setActive(false);
 
 		patientRepository.save(dbPatient);
 
 	}
-
-
 
 	@Override
 	public List<Long> getPatientCount() {
@@ -88,7 +82,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		long activePatient = customPatientRepo.countByStatus("active");
 		long deactivePatient = customPatientRepo.countByStatus("deactive");
 		deactivePatient += customPatientRepo.countByStatus("block");
-		
+
 		List<Long> countList = new ArrayList<>();
 		countList.add(totalPatient);
 		countList.add(activePatient);
@@ -96,7 +90,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		for (Long count : countList) {
 			log.info(count.toString());
 		}
-		return countList;	
+		return countList;
 	}
 
 	@Override
@@ -106,5 +100,4 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		return patientRepository.getById(patient.getUserId());
 	}
 
-	
 }

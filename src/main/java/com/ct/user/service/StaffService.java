@@ -4,16 +4,17 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ct.user.model.Staff;
+import com.ct.user.model.UserDto;
 
 public interface StaffService extends UserService {
 
 	/**
 	 * Create new staff model, set that model and persist in Database
 	 * 
-	 * @param staff
+	 * @param newStaff
 	 * @return
 	 */
-	Staff save(Staff staff);
+	Staff save(UserDto newStaff);
 
 	/**
 	 * Returns All the Staff Details
@@ -38,7 +39,7 @@ public interface StaffService extends UserService {
 	 * @param dbStaff
 	 * @return
 	 */
-	Staff updateStaff(Staff updatedStaff, Staff dbStaff);
+	Staff updateStaff(UserDto updatedStaff, Staff dbStaff);
 
 	/**
 	 * Disable and Deactivate the Staff
