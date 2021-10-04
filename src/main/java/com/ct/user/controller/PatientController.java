@@ -15,11 +15,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ct.user.constant.Messages;
 import com.ct.user.exception.PatientNotFoundException;
 import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
 import com.ct.user.model.Patient;
 import com.ct.user.model.UserDto;
 import com.ct.user.model.validation.PatientInfo;
+import com.ct.user.response.ResponseModel;
 import com.ct.user.service.PatientService;
 
 import lombok.extern.java.Log;
@@ -57,7 +59,8 @@ public class PatientController {
 	 * @return
 	 */
 	@PostMapping("/patients")
-	public ResponseEntity<String> newPatient(@Validated(value = PatientInfo.class) @RequestBody UserDto newPatient) {
+	public ResponseEntity<ResponseModel> newPatient(
+			@Validated(value = PatientInfo.class) @RequestBody UserDto newPatient) {
 		log.info("INSIDE newPatient");
 
 		// Need to verify email is already exists if exists send them user exists with
@@ -68,7 +71,7 @@ public class PatientController {
 
 		patientService.save(newPatient);
 
-		return ResponseEntity.ok("Employee Added Successfully");
+		return ResponseEntity.ok(new ResponseModel(Messages.PATIENT_ADDED_SUCCESSFULLY));
 	}
 
 	/**

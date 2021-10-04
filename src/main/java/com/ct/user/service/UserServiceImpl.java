@@ -7,10 +7,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ct.user.constant.FinalVariables;
 import com.ct.user.exception.RoleNotFoundException;
 import com.ct.user.exception.auth.EmailIdNotRegisteredException;
 import com.ct.user.exception.auth.PasswordNotVerifiedException;
-import com.ct.user.model.FinalVariables;
+import com.ct.user.model.AuthDto;
 import com.ct.user.model.Patient;
 import com.ct.user.model.Role;
 import com.ct.user.model.Staff;
@@ -95,14 +96,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Optional<UserDto> authenticate(UserDto userDto, User user) {
+	public Optional<UserDto> authenticate(AuthDto authDto, User user) {
 		log.info("INSIDE authenticate");
 
 		UserDto responseUserDto = null;
 		Integer attempt = user.getAttempt();
 
 		// If Incorrect Password or Attempt exceeds
-		if (!userDto.getPassword().equals(user.getPassword()) || user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
+		if (!authDto.getPassword().equals(user.getPassword()) || user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
 
 			// If incorrect increment attempt and persist
 			attempt += 1;
@@ -113,7 +114,7 @@ public class UserServiceImpl implements UserService {
 			responseUserDto.setEmail(user.getEmail());
 			responseUserDto.setAttempt(attempt);
 
-		} else if (userDto.getPassword().equals(user.getPassword())) {
+		} else if (authDto.getPassword().equals(user.getPassword())) {
 			// Check Password is correct
 
 			if (user.getAttempt() >= 0 && user.getAttempt() <= FinalVariables.MAX_ATTEMPT) {
@@ -152,7 +153,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Optional<UserDto> updateCredentials(UserDto userDto, User user) throws PasswordNotVerifiedException {
+	public Optional<UserDto> updateCredentials(AuthDto userDto, User user) throws PasswordNotVerifiedException {
 		log.info("INSIDE updateCredentials");
 
 		String newPassoword = userDto.getNewPassword();

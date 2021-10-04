@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.ct.user.exception.auth.EmailIdNotRegisteredException;
-import com.ct.user.exception.auth.PasswordMaxAttemptException;
 import com.ct.user.exception.auth.BlankPasswordException;
 import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
+import com.ct.user.exception.auth.EmailIdNotRegisteredException;
+import com.ct.user.exception.auth.PasswordMaxAttemptException;
 import com.ct.user.exception.auth.PasswordNotVerifiedException;
 import com.ct.user.exception.auth.UserNotFoundException;
 

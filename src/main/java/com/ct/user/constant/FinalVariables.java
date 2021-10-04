@@ -1,4 +1,4 @@
-package com.ct.user.model;
+package com.ct.user.constant;
 
 /**
  * Constant Used in Application

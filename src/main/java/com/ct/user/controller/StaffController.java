@@ -3,6 +3,7 @@ package com.ct.user.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,11 +15,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ct.user.constant.Messages;
 import com.ct.user.exception.StaffNotFoundException;
 import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
 import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.model.validation.EmployeeInfo;
+import com.ct.user.response.ResponseModel;
 import com.ct.user.service.StaffService;
 
 import lombok.extern.java.Log;
@@ -49,8 +52,8 @@ public class StaffController {
 	 * @param newStaff
 	 * @return
 	 */
-	@PostMapping("/employees")
-	public ResponseEntity<String> newStaff(@Validated(value = EmployeeInfo.class) @RequestBody UserDto newStaff) {
+	@PostMapping(path = "/employees", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> newStaff(@Validated(value = EmployeeInfo.class) @RequestBody UserDto newStaff) {
 		log.info("INSIDE newStaff()");
 
 		// Need to verify email is already exists if exists send them user exists with
@@ -61,7 +64,7 @@ public class StaffController {
 
 		staffService.save(newStaff);
 
-		return ResponseEntity.ok("Employee Added Successfully");
+		return ResponseEntity.ok(new ResponseModel(Messages.EMPLOYEE_ADDED_SUCCESSFULLY));
 	}
 
 	/**
@@ -85,14 +88,14 @@ public class StaffController {
 	 * @return
 	 */
 	@PutMapping("/employees/{id}")
-	public ResponseEntity<String> replaceStaff(@PathVariable long id, @RequestBody UserDto staff) {
+	public ResponseEntity<?> replaceStaff(@PathVariable long id, @RequestBody UserDto staff) {
 		log.info("INSIDE replaceStaff()");
 
 		Staff dbstaff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
 
 		staffService.updateStaff(staff, dbstaff);
 
-		return ResponseEntity.ok("Employee Details Updated Successfully");
+		return ResponseEntity.ok(new ResponseModel(Messages.EMPLOYEE_UPDATED_SUCCESSFULLY));
 	}
 
 	/**

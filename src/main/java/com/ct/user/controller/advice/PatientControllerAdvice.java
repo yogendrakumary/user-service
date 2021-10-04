@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.ct.user.exception.PatientNotFoundException;
-import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
 
 import lombok.extern.java.Log;
 

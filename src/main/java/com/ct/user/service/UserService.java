@@ -3,6 +3,7 @@ package com.ct.user.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.ct.user.model.AuthDto;
 import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.model.User;
@@ -40,7 +41,7 @@ public interface UserService {
 	 * @param dbUser TODO
 	 * @return
 	 */
-	Optional<UserDto> authenticate(UserDto userDto, User dbUser);
+	Optional<UserDto> authenticate(AuthDto userDto, User dbUser);
 
 	/**
 	 * Update the credentials
@@ -49,7 +50,7 @@ public interface UserService {
 	 * @param user TODO
 	 * @return
 	 */
-	Optional<UserDto> updateCredentials(UserDto userDto, User user);
+	Optional<UserDto> updateCredentials(AuthDto userDto, User user);
 
 	/**
 	 * To Reset User Credentials

@@ -4,27 +4,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.ct.user.model.AuthDto;
 import com.ct.user.model.User;
-import com.ct.user.model.UserDto;
 import com.ct.user.repo.UserRepository;
 import com.ct.user.service.UserService;
 
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 public class UserServiceImplTest {
 
 	@Mock
 	UserRepository userRepository;
 
-	@MockBean
+	@InjectMocks
 	UserService userService;
-	
-	User user =  null;
+
+	User user = null;
 
 	@BeforeEach
 	void initialUser() {
@@ -37,12 +38,12 @@ public class UserServiceImplTest {
 	@Test
 	void authenticateTest() {
 
-		UserDto userDto = new UserDto();
+		AuthDto userDto = new AuthDto();
 		userDto.setEmail("admin@admin");
 		userDto.setPassword("Welcome@123");
-		
+
 		assertEquals(userService.authenticate(userDto, user).get(), user);
-		
+
 	}
 
 }

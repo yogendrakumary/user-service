@@ -1,23 +1,31 @@
 package com.ct.user.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ct.user.exception.auth.BlankPasswordException;
+import com.ct.user.constant.FinalVariables;
+import com.ct.user.constant.Messages;
 import com.ct.user.exception.auth.EmailIdNotRegisteredException;
 import com.ct.user.exception.auth.PasswordMaxAttemptException;
+import com.ct.user.exception.auth.PasswordNotVerifiedException;
 import com.ct.user.exception.auth.UserNotFoundException;
-import com.ct.user.model.FinalVariables;
+import com.ct.user.model.AuthDto;
 import com.ct.user.model.User;
 import com.ct.user.model.UserDto;
+import com.ct.user.model.validation.ForgetInfo;
+import com.ct.user.model.validation.LoginInfo;
+import com.ct.user.model.validation.UpdateInfo;
+import com.ct.user.response.ResponseModel;
 import com.ct.user.service.UserService;
 
 import lombok.extern.java.Log;
@@ -34,58 +42,48 @@ public class AuthController {
 	/**
 	 * User Verification with email and password
 	 * 
-	 * @param userDto
+	 * @param authDto
 	 * @return
 	 */
 	@PostMapping("/verify")
-	public ResponseEntity<?> authenticate(@RequestBody UserDto userDto) {
+	public ResponseEntity<?> authenticate(@Validated(value = LoginInfo.class) @RequestBody AuthDto authDto) {
 		log.info("INSIDE Authenticate");
 
-		if (userDto == null) {
+		if (authDto == null) {
 			throw new UserNotFoundException();
 		}
 
-		if (userDto.getPassword() == null || userDto.getPassword().trim().isEmpty()) {
-			throw new BlankPasswordException();
-		}
-
-		User user = userServiceImpl.getUserByEmailId(userDto.getEmail())
+		User user = userServiceImpl.getUserByEmailId(authDto.getEmail())
 				.orElseThrow(EmailIdNotRegisteredException::new);
 
 		if (user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
 			throw new PasswordMaxAttemptException();
 		}
 
-		Optional<UserDto> optional = userServiceImpl.authenticate(userDto, user);
+		UserDto authenticatedUser = userServiceImpl.authenticate(authDto, user).orElseThrow(UserNotFoundException::new);
 
-		if (optional.isPresent()) {
-			UserDto authenticatedUser = optional.get();
-
-			if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT || authenticatedUser.getRoleId() == 0) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticatedUser);
-			}
-
-			return ResponseEntity.ok().body(authenticatedUser);
+		if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT || authenticatedUser.getRoleId() == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticatedUser);
 		}
 
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No User found with given email Id");
+		return ResponseEntity.ok().body(authenticatedUser);
 	}
 
 	/**
 	 * To Request when user forget the credentials
 	 * 
-	 * @param userDto
+	 * @param authDto
 	 * @return
 	 */
 	@PostMapping("/forget")
-	public ResponseEntity<?> forget(@RequestBody UserDto userDto) {
+	public ResponseEntity<?> forget(@Validated(value = ForgetInfo.class) @RequestBody AuthDto authDto) {
 		log.info("INSIDE forget");
 
-		if (userDto == null) {
+		if (authDto == null) {
 			throw new UserNotFoundException();
 		}
 
-		User user = userServiceImpl.getUserByEmailId(userDto.getEmail())
+		User user = userServiceImpl.getUserByEmailId(authDto.getEmail())
 				.orElseThrow(EmailIdNotRegisteredException::new);
 
 		userServiceImpl.resetUser(user);
@@ -96,29 +94,29 @@ public class AuthController {
 	/**
 	 * Request to update credentials
 	 * 
-	 * @param userDto
+	 * @param authDto
 	 * @return
 	 */
-	@PostMapping("/update")
-	public ResponseEntity<?> update(@RequestBody UserDto userDto) {
+	@PostMapping(path = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> update(@Validated(value = UpdateInfo.class) @RequestBody AuthDto authDto) {
 		log.info("INSIDE update");
 
-		if (userDto == null) {
+		if (authDto == null) {
 			throw new UserNotFoundException();
 		}
 
-		if (userDto.getNewPassword() == null || userDto.getNewPassword().trim().isEmpty())
-			throw new BlankPasswordException();
-
-		User user = userServiceImpl.getUserByEmailId(userDto.getEmail())
+		User user = userServiceImpl.getUserByEmailId(authDto.getEmail())
 				.orElseThrow(EmailIdNotRegisteredException::new);
 
-		Optional<UserDto> optional = userServiceImpl.updateCredentials(userDto, user);
+		userServiceImpl.updateCredentials(authDto, user)
+				.orElseThrow(() -> new PasswordNotVerifiedException("Issue While updating passoword"));
 
-		if (optional.isPresent()) {
-			return ResponseEntity.ok(optional.get());
-		}
+		return ResponseEntity.ok(new ResponseModel(Messages.PASSWORD_UPDATED_SUCCESSFULLY));
+	}
 
-		return ResponseEntity.badRequest().body("Issue While updating passoword");
+	@GetMapping("/valid/{email}")
+	public ResponseEntity<Boolean> validateEmail(@PathVariable String email) {
+		log.info("INSIDE validateEmail");
+		return ResponseEntity.ok(userServiceImpl.getUserByEmailId(email).isPresent());
 	}
 }
