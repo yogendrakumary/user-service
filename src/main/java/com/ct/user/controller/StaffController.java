@@ -135,5 +135,14 @@ public class StaffController {
 			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	@GetMapping("employees/physicians")
+	public ResponseEntity<?>getAllPhysicians(){
+		try {
+			return new ResponseEntity<List<Staff>>(staffService.getAllPhysicians(),HttpStatus.OK);
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 }

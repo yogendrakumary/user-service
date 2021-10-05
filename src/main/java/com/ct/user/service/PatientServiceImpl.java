@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Patient;
 import com.ct.user.repo.PatientRepository;
-import com.ct.user.repo.PatientRepositoryImpl;
+
 
 import lombok.extern.java.Log;
 
@@ -19,8 +19,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 	@Autowired
 	private PatientRepository patientRepository;
-	@Autowired
-	private PatientRepositoryImpl customPatientRepo;
+	
 
 	@Override
 	public Patient save(Patient patient) {
@@ -85,9 +84,9 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	@Override
 	public List<Long> getPatientCount() {
 		long totalPatient = patientRepository.count();
-		long activePatient = customPatientRepo.countByStatus("active");
-		long deactivePatient = customPatientRepo.countByStatus("deactive");
-		deactivePatient += customPatientRepo.countByStatus("block");
+		long activePatient = patientRepository.countByStatus("active");
+		long deactivePatient = patientRepository.countByStatus("deactive");
+		deactivePatient += patientRepository.countByStatus("block");
 		
 		List<Long> countList = new ArrayList<>();
 		countList.add(totalPatient);

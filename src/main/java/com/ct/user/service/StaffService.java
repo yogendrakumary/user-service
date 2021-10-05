@@ -51,4 +51,6 @@ public interface StaffService extends UserService {
 
 	void editStaffStatus(List<Staff> employeeList);
 
+	List<Staff> getAllPhysicians();
+
 }

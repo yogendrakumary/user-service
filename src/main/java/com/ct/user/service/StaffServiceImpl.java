@@ -7,9 +7,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.repo.StaffRepository;
-import com.ct.user.repo.StaffRepositoryImpl;
 
 import lombok.extern.java.Log;
 
@@ -20,8 +20,6 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	@Autowired
 	private StaffRepository staffRepository;
 
-	@Autowired
-	private StaffRepositoryImpl customStaffRepo;
 
 	@Override
 	public Staff save(Staff staff) {
@@ -87,9 +85,9 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	@Override
 	public List<Long> getStaffCount() {
 		long totalEmployee = staffRepository.count();
-		long activeEmployee = customStaffRepo.countByStatus("active");
-		long deactiveEmployee = customStaffRepo.countByStatus("deactive");
-		deactiveEmployee += customStaffRepo.countByStatus("block");
+		long activeEmployee = staffRepository.countByStatus("active");
+		long deactiveEmployee = staffRepository.countByStatus("deactive");
+		deactiveEmployee += staffRepository.countByStatus("block");
 
 		List<Long> countList = new ArrayList<>();
 		countList.add(totalEmployee);
@@ -103,8 +101,20 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Override
 	public void editStaffStatus(List<Staff> employeeList) {
-		// TODO Auto-generated method stub
+		Staff obj = new Staff();
+		log.info("Inside User Service Mehod to edit Employee status");
+		for (Staff staff : employeeList) {
+			 obj = staffRepository.getById(staff.getUserId());
+				obj.setUserId(staff.getUserId());
+				obj.setStatus(staff.getStatus());	
+				staffRepository.save(obj);
+		}
 		
+	}
+
+	@Override
+	public List<Staff> getAllPhysicians() {
+		return staffRepository.findAllByRoleId(2);
 	}
 
 }
