@@ -1,13 +1,11 @@
 package com.ct.user.controller;
 
 import java.util.List;
-import java.util.Optional;
-
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +15,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+<<<<<<< HEAD
 import com.ct.user.model.Patient;
+=======
+import com.ct.user.constant.Messages;
+>>>>>>> bb6f76fa02ffc7d60a1c4ee7a38ee3b13c6e9a80
 import com.ct.user.exception.StaffNotFoundException;
+import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
 import com.ct.user.model.Staff;
-import com.ct.user.model.User;
+import com.ct.user.model.UserDto;
+import com.ct.user.model.validation.EmployeeInfo;
+import com.ct.user.response.ResponseModel;
 import com.ct.user.service.StaffService;
 
 import lombok.extern.java.Log;
@@ -51,20 +56,19 @@ public class StaffController {
 	 * @param newStaff
 	 * @return
 	 */
-	@PostMapping("/employees")
-	public ResponseEntity<?> newStaff(@Valid @RequestBody Staff newStaff) {
+	@PostMapping(path = "/employees", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> newStaff(@Validated(value = EmployeeInfo.class) @RequestBody UserDto newStaff) {
 		log.info("INSIDE newStaff()");
 
-		// Need to verify email is already exists if exists send them user ecists with
+		// Need to verify email is already exists if exists send them user exists with
 		// email id, you can forget
-		Optional<User> optional = staffService.getUserByEmailId(newStaff.getEmail());
-		if (optional.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Email Id Already Exist");
-		}
+		staffService.getUserByEmailId(newStaff.getEmail()).ifPresent(s -> {
+			throw new EmailIdAlreadyRegisteredException();
+		});
 
-		Staff dbStaff = staffService.save(newStaff);
+		staffService.save(newStaff);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(dbStaff);
+		return ResponseEntity.ok(new ResponseModel(Messages.EMPLOYEE_ADDED_SUCCESSFULLY));
 	}
 
 	/**
@@ -77,8 +81,7 @@ public class StaffController {
 	public Staff one(@PathVariable long id) {
 		log.info("INSIDE one()");
 
-		Staff staff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
-		return staff;
+		return staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
 	}
 
 	/**
@@ -89,13 +92,14 @@ public class StaffController {
 	 * @return
 	 */
 	@PutMapping("/employees/{id}")
-	public ResponseEntity<?> replaceStaff(@PathVariable long id, @RequestBody Staff staff) {
+	public ResponseEntity<?> replaceStaff(@PathVariable long id, @RequestBody UserDto staff) {
 		log.info("INSIDE replaceStaff()");
 
 		Staff dbstaff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
-		dbstaff = staffService.updateStaff(staff, dbstaff);
 
-		return ResponseEntity.status(HttpStatus.OK).body(dbstaff);
+		staffService.updateStaff(staff, dbstaff);
+
+		return ResponseEntity.ok(new ResponseModel(Messages.EMPLOYEE_UPDATED_SUCCESSFULLY));
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class StaffController {
 	 * @return
 	 */
 	@DeleteMapping("/employees/{id}")
-	public ResponseEntity<?> removeStaff(@PathVariable long id) {
+	public ResponseEntity<String> removeStaff(@PathVariable long id) {
 		log.info("INSIDE removeStaff()");
 
 		Staff dbstaff = staffService.getStaff(id).orElseThrow(() -> new StaffNotFoundException(id));
@@ -115,7 +119,7 @@ public class StaffController {
 	}
 
 	@GetMapping("/employee/employeecount")
-	List<Long> employeeCount() {
+	public List<Long> employeeCount() {
 		return staffService.getStaffCount();
 	}
 	

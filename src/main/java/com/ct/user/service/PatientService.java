@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ct.user.model.Patient;
+import com.ct.user.model.UserDto;
 
 public interface PatientService extends UserService {
 
@@ -20,7 +21,7 @@ public interface PatientService extends UserService {
 	 * @param patient
 	 * @return
 	 */
-	Patient save(Patient patient);
+	Patient save(UserDto patient);
 
 	/**
 	 * Returns Patient From By Searching with User ID
@@ -37,7 +38,7 @@ public interface PatientService extends UserService {
 	 * @param dbPatient
 	 * @return
 	 */
-	Patient updatePatient(Patient patient, Patient dbPatient);
+	Patient updatePatient(UserDto patient, Patient dbPatient);
 
 	/**
 	 * To change status of patient

@@ -9,8 +9,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
@@ -34,22 +32,17 @@ public class User {
 	private Long userId;
 
 	@Column(length = 5, nullable = false)
-	@NotBlank(message = "Title Should not be Null")
 	private String title;
 
 	@Column(length = 50, nullable = false)
-	@NotBlank(message = "First name cannot be empty.")
 	private String firstName;
 
 	@Column(length = 50, nullable = false)
-	@NotBlank(message = "Last name cannot be empty.")
 	private String lastName;
 
 	@Column(length = 50, nullable = false, unique = true)
-	@NotBlank(message = "Please enter your email address e.g. exampleusername@xyzdomain.com")
 	private String email;
 
-	@NotNull(message = "Please enter a valid date")
 	@Column(nullable = false)
 	private java.sql.Date birthDate;
 
