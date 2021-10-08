@@ -12,6 +12,7 @@ import com.ct.user.service.RolesService;
 
 @RestController
 @CrossOrigin(origins = "*")
+//@RequestMapping("/users/api")
 public class RolesController {
 
 	@Autowired

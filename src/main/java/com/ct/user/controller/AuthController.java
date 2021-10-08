@@ -34,6 +34,7 @@ import lombok.extern.java.Log;
 @CrossOrigin(origins = "*")
 @RequestMapping("/auth")
 @Log
+//@RequestMapping("/users/api/auth")
 public class AuthController {
 
 	@Autowired
@@ -119,4 +120,6 @@ public class AuthController {
 		log.info("INSIDE validateEmail");
 		return ResponseEntity.ok(userServiceImpl.getUserByEmailId(email).isPresent());
 	}
+
+	
 }

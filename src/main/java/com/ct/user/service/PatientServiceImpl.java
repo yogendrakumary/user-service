@@ -11,6 +11,7 @@ import com.ct.user.model.Patient;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.PatientRepository;
 import com.ct.user.repo.PatientRepositoryImpl;
+import com.ct.user.utility.EmailServiceImpl;
 
 import lombok.extern.java.Log;
 
@@ -20,8 +21,12 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 	@Autowired
 	private PatientRepository patientRepository;
+
 	@Autowired
 	private PatientRepositoryImpl customPatientRepo;
+
+	@Autowired
+	private EmailServiceImpl emailServiceImpl;
 
 	@Override
 	public Patient save(UserDto patient) {
@@ -38,7 +43,18 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 		newPatient.setAttempt(0);
 
-		return patientRepository.save(newPatient);
+		newPatient = patientRepository.save(newPatient);
+
+		String subject = "Welcome to CT General Hospital!";
+		String body = String.format("Thanks for registering at CT General Hospital\r\n "
+				+ "Hi, %s Thank you for creating your account at CT General hospital.Your accounts details as follows:\r\n "
+				+ "Email Address : %s \r\n " + "Password :[The Password you specified]\r\n "
+				+ "To Sign in to your account, please visit https://localhost:8080/ or Click here. \r\n\r\n "
+				+ "CT General Hospital", newPatient.getFirstName(), newPatient.getEmail());
+
+		emailServiceImpl.sendSimpleMessage(newPatient.getEmail(), subject, body);
+
+		return newPatient;
 	}
 
 	@Override

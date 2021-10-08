@@ -18,6 +18,7 @@ import com.ct.user.model.Staff;
 import com.ct.user.model.User;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.UserRepository;
+import com.ct.user.utility.EmailServiceImpl;
 
 import lombok.extern.java.Log;
 
@@ -30,6 +31,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private RolesService rolesService;
+
+	@Autowired
+	private EmailServiceImpl emailServiceImpl;
 
 	@Override
 	public List<UserDto> getAllUserFromPatient(List<Patient> patients) {
@@ -143,9 +147,19 @@ public class UserServiceImpl implements UserService {
 	public Optional<UserDto> resetUser(User user) {
 		log.info("INSIDE resetUser");
 
+		String resetSubject = String.format("Reset Password - %s", user.getFirstName());
+		String resetBody = String.format(
+				"Dear %s, \r\n \r\n" + "Forgot your password ? \r\n"
+						+ "We received a request to reset the password for your account. \r\n \r\n"
+						+ "To reset your password, click on the link below : \r\nhttp://localhost:4200 \r\n \r\n"
+						+ "To login, use your secret code! \r\n%s \r\n \r\n"
+						+ "If you did not forget your password, you can ignore this email.",
+				user.getFirstName(), user.getPassword());
+
 		// Generating token or otp to login
 
 		// Sending mail with link to forget
+		emailServiceImpl.sendSimpleMessage(user.getEmail(), resetSubject, resetBody);
 
 		UserDto responseUserDto = this.mapUserToUserDto(user);
 

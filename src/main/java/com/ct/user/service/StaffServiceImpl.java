@@ -11,6 +11,7 @@ import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.StaffRepository;
 import com.ct.user.repo.StaffRepositoryImpl;
+import com.ct.user.utility.EmailServiceImpl;
 
 import lombok.extern.java.Log;
 
@@ -23,6 +24,9 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Autowired
 	private StaffRepositoryImpl customStaffRepo;
+
+	@Autowired
+	private EmailServiceImpl emailServiceImpl;
 
 	@Override
 	public Staff save(UserDto staff) {
@@ -46,6 +50,16 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		newStaff.setAttempt(-1);
 
 		newStaff = staffRepository.save(newStaff);
+
+		String subject = "Welcome to CT General Hospital!";
+		String body = String.format("Thanks for registering at CT General Hospital\r\n "
+				+ "Hi, %s Thank you for creating your account at CT General hospital.Your accounts details as follows:\r\n "
+				+ "Email Address : %s \r\n " + "One Time Password :Welcome@123\r\n "
+				+ "Sign with this One Time Password and Reset Account\r\n"
+				+ "To Sign in to your account, please visit https://localhost:8080/ or Click here. \r\n\r\n "
+				+ "CT General Hospital", newStaff.getFirstName(), newStaff.getEmail());
+
+		emailServiceImpl.sendSimpleMessage(newStaff.getEmail(), subject, body);
 
 		return newStaff;
 	}
