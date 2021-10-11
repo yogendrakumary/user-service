@@ -78,17 +78,11 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	@Override
 	public List<Long> getPatientCount() {
 		long totalPatient = patientRepository.count();
-<<<<<<< HEAD
+
 		long activePatient = patientRepository.countByStatus("active");
 		long deactivePatient = patientRepository.countByStatus("deactive");
 		deactivePatient += patientRepository.countByStatus("block");
 		
-=======
-		long activePatient = customPatientRepo.countByStatus("active");
-		long deactivePatient = customPatientRepo.countByStatus("deactive");
-		deactivePatient += customPatientRepo.countByStatus("block");
-
->>>>>>> bb6f76fa02ffc7d60a1c4ee7a38ee3b13c6e9a80
 		List<Long> countList = new ArrayList<>();
 		countList.add(totalPatient);
 		countList.add(activePatient);

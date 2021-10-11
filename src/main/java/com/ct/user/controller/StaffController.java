@@ -3,6 +3,7 @@ package com.ct.user.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,13 +16,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-<<<<<<< HEAD
-import com.ct.user.model.Patient;
-=======
 import com.ct.user.constant.Messages;
->>>>>>> bb6f76fa02ffc7d60a1c4ee7a38ee3b13c6e9a80
 import com.ct.user.exception.StaffNotFoundException;
 import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
+import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.model.validation.EmployeeInfo;

@@ -127,18 +127,13 @@ public class PatientController {
 	}
 
 	@PutMapping("patient/editstatus")
-<<<<<<< HEAD
+
 	public ResponseEntity<?> editPatientStatus(@RequestBody List<Patient> patientList ){
 		log.info("Inside User service Controller to edit status");
 		try {
 			patientService.editPatientStatus(patientList);
 			return new ResponseEntity<Patient>(HttpStatus.OK);
-=======
-	public ResponseEntity<?> editPatientStatus(@RequestBody Patient patient) {
 
-		try {
-			return new ResponseEntity<>(patientService.editPatientStatus(patient), HttpStatus.OK);
->>>>>>> bb6f76fa02ffc7d60a1c4ee7a38ee3b13c6e9a80
 		}
 
 		catch (Exception e) {
