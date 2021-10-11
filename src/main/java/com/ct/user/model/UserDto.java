@@ -57,8 +57,8 @@ public class UserDto {
 	private String languages;
 	private String address;
 
-	private String oldPassword;
-	private String newPassword;
+//	private String oldPassword;
+//	private String newPassword;
 
 	private java.util.Date createdOn;
 	private java.util.Date updatedOn;

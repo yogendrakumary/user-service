@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.constant.Messages;
@@ -23,6 +24,7 @@ import com.ct.user.model.UserDto;
 import com.ct.user.model.validation.PatientInfo;
 import com.ct.user.response.ResponseModel;
 import com.ct.user.service.PatientService;
+import com.ct.user.utility.EmailServiceImpl;
 
 import lombok.extern.java.Log;
 
@@ -35,10 +37,12 @@ import lombok.extern.java.Log;
 @RestController
 @CrossOrigin(origins = "*")
 @Log
+//@RequestMapping("/users/api")
 public class PatientController {
 
 	@Autowired
 	private PatientService patientService;
+
 
 	/**
 	 * Return All Patients
