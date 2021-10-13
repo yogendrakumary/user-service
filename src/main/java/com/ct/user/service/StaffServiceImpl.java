@@ -35,6 +35,8 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		// TO fethc last empId
 		Integer lastEmpId = staffRepository.getLastEmployeeId().orElse(0);
 
+		String otp = "Welcome@123";
+
 		Staff newStaff = new Staff();
 
 		newStaff.setTitle(staff.getTitle());
@@ -44,7 +46,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		newStaff.setRoleId(staff.getRoleId());
 		newStaff.setBirthDate(staff.getBirthDate());
 
-		newStaff.setPassword(staff.getPassword());
+		newStaff.setPassword(otp);
 		newStaff.setEmpId(lastEmpId + 1);
 
 		newStaff.setAttempt(-1);
@@ -54,10 +56,10 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		String subject = "Welcome to CT General Hospital!";
 		String body = String.format("Thanks for registering at CT General Hospital\r\n "
 				+ "Hi, %s Thank you for creating your account at CT General hospital.Your accounts details as follows:\r\n "
-				+ "Email Address : %s \r\n " + "One Time Password :Welcome@123\r\n "
+				+ "Email Address : %s \r\n " + "One Time Password : %s\r\n "
 				+ "Sign with this One Time Password and Reset Account\r\n"
 				+ "To Sign in to your account, please visit https://localhost:8080/ or Click here. \r\n\r\n "
-				+ "CT General Hospital", newStaff.getFirstName(), newStaff.getEmail());
+				+ "CT General Hospital", newStaff.getFirstName(), newStaff.getEmail(), otp);
 
 		emailServiceImpl.sendSimpleMessage(newStaff.getEmail(), subject, body);
 

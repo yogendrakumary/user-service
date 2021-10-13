@@ -147,6 +147,11 @@ public class UserServiceImpl implements UserService {
 	public Optional<UserDto> resetUser(User user) {
 		log.info("INSIDE resetUser");
 
+		String resetPassword = "Welcome@123";
+
+		user.setAttempt(-1);
+		user.setPassword(resetPassword);
+
 		String resetSubject = String.format("Reset Password - %s", user.getFirstName());
 		String resetBody = String.format(
 				"Dear %s, \r\n \r\n" + "Forgot your password ? \r\n"
@@ -154,7 +159,7 @@ public class UserServiceImpl implements UserService {
 						+ "To reset your password, click on the link below : \r\nhttp://localhost:4200 \r\n \r\n"
 						+ "To login, use your secret code! \r\n%s \r\n \r\n"
 						+ "If you did not forget your password, you can ignore this email.",
-				user.getFirstName(), user.getPassword());
+				user.getFirstName(), resetPassword);
 
 		// Generating token or otp to login
 
