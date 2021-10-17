@@ -20,10 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-<<<<<<< HEAD
+
 import org.springframework.web.bind.annotation.RequestParam;
-=======
->>>>>>> 586c63bdf99fbe83b7ee172cbd7cc105ac032b9b
+
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.constant.Messages;
