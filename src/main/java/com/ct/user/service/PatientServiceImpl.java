@@ -1,13 +1,18 @@
 package com.ct.user.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Patient;
+import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.PatientRepository;
 
@@ -120,6 +125,29 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 				obj.setStatus(patient.getStatus());	
 				patientRepository.save(obj);
 		}
+	}
+
+	@Override
+	public Map<String, Object> getAllFilteredPatientDetails(Pageable paging) {
+		Page<Patient> pagePatient = patientRepository.findAll(paging);
+		List<Patient> patients = pagePatient.getContent();
+		Map<String, Object> response = new HashMap<>();
+		response.put("content", patients);
+		response.put("currentPage", pagePatient.getNumber());
+		response.put("totalItems", pagePatient.getTotalElements());
+		response.put("totalPages", pagePatient.getTotalPages());
+		response.put("last", pagePatient.isLast());
+		response.put("first", pagePatient.isFirst());
+		response.put("sort", pagePatient.getSort());
+		response.put("numberOfElements", pagePatient.getNumberOfElements());
+		response.put("number", pagePatient.getNumber());
+		response.put("empty", pagePatient.isEmpty());
+		response.put("totalElements", pagePatient.getTotalElements());
+		response.put("page", pagePatient.getNumber());
+		response.put("size", pagePatient.getSize());
+		
+		
+		return response;
 	}
 
 }

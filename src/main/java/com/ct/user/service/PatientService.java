@@ -1,7 +1,10 @@
 package com.ct.user.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.data.domain.Pageable;
 
 import com.ct.user.model.Patient;
 import com.ct.user.model.UserDto;
@@ -50,5 +53,7 @@ public interface PatientService extends UserService {
 	List<Long> getPatientCount();
 
 	void editPatientStatus(List<Patient> patientList);
+
+	Map<String, Object> getAllFilteredPatientDetails(Pageable paging);
 
 }

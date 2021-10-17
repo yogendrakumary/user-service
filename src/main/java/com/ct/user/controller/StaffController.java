@@ -1,8 +1,14 @@
 package com.ct.user.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +20,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.constant.Messages;
 import com.ct.user.exception.StaffNotFoundException;
 import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
-import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.model.validation.EmployeeInfo;
@@ -43,11 +48,18 @@ public class StaffController {
 	 * 
 	 * @return
 	 */
-	@GetMapping("/employees")
-	public List<Staff> all() {
+	@GetMapping(value = "/employees")
+	public ResponseEntity<?> all(){
 		log.info("INSIDE all()");
-
-		return staffService.getAllStaffDetails();
+		try {
+			
+			return new ResponseEntity<List<Staff>>(staffService.getAllStaffDetails(),HttpStatus.OK);
+			
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 
 	/**
@@ -132,7 +144,7 @@ public class StaffController {
 		log.info("Inside User service Controller to edit status");
 		try {
 			staffService.editStaffStatus(EmployeeList);
-			return new ResponseEntity<Patient>(HttpStatus.OK);
+			return new ResponseEntity<String>("Status Edited",HttpStatus.OK);
 		}
 		
 		catch(Exception e) {
@@ -148,5 +160,26 @@ public class StaffController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	@GetMapping(value = "/filteredemployees",produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> allEmployee(
+		
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size,
+			@RequestParam(defaultValue = "userId") String columnName,
+			@RequestParam(defaultValue = "ASC") String direction
+			){
+		try {
+			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
+			Pageable paging = PageRequest.of(page, size,sort);	
+			log.info(paging.toString());
+			return new ResponseEntity<>(staffService.getAllFilteredStaffDetails(paging),HttpStatus.OK);
+			
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+
 
 }

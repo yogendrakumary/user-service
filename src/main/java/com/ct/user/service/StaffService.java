@@ -1,7 +1,10 @@
 package com.ct.user.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.springframework.data.domain.Pageable;
 
 import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
@@ -53,5 +56,7 @@ public interface StaffService extends UserService {
 	void editStaffStatus(List<Staff> employeeList);
 
 	List<Staff> getAllPhysicians();
+
+	Map<String, Object> getAllFilteredStaffDetails(Pageable paging);
 
 }
