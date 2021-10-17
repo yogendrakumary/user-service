@@ -3,7 +3,6 @@ package com.ct.user.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
