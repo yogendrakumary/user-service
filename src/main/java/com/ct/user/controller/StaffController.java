@@ -1,8 +1,13 @@
-package com.ct.user.controller;
+	package com.ct.user.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.constant.Messages;
@@ -40,11 +46,18 @@ public class StaffController {
 	 * 
 	 * @return
 	 */
-	@GetMapping("/employees")
-	public List<Staff> all() {
+	@GetMapping(value = "/employees")
+	public ResponseEntity<?> all(){
 		log.info("INSIDE all()");
-
-		return staffService.getAllStaffDetails();
+		try {
+			
+			return new ResponseEntity<List<Staff>>(staffService.getAllStaffDetails(),HttpStatus.OK);
+			
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 
 	/**
@@ -119,5 +132,52 @@ public class StaffController {
 	public List<Long> employeeCount() {
 		return staffService.getStaffCount();
 	}
+	
+	/* this method is edit the employees Status 
+	 * it will received the list of employees
+	 * and send it the staff service
+	 * */
+	@PutMapping("employee/editstatus")
+	public ResponseEntity<?> editStaffStatus(@RequestBody List<Staff> EmployeeList ){
+		log.info("Inside User service Controller to edit status");
+		try {
+			staffService.editStaffStatus(EmployeeList);
+			return new ResponseEntity<String>("Status Edited",HttpStatus.OK);
+		}
+		
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	@GetMapping("employees/physicians")
+	public ResponseEntity<?>getAllPhysicians(){
+		try {
+			return new ResponseEntity<List<Staff>>(staffService.getAllPhysicians(),HttpStatus.OK);
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	@GetMapping(value = "/filteredemployees",produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> allEmployee(
+		
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size,
+			@RequestParam(defaultValue = "userId") String columnName,
+			@RequestParam(defaultValue = "ASC") String direction
+			){
+		try {
+			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
+			Pageable paging = PageRequest.of(page, size,sort);	
+			log.info(paging.toString());
+			return new ResponseEntity<>(staffService.getAllFilteredStaffDetails(paging),HttpStatus.OK);
+			
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+
 
 }

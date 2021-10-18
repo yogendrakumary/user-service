@@ -1,17 +1,24 @@
 package com.ct.user.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.StaffRepository;
-import com.ct.user.repo.StaffRepositoryImpl;
+
+
 import com.ct.user.utility.EmailServiceImpl;
+
 
 import lombok.extern.java.Log;
 
@@ -22,8 +29,6 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	@Autowired
 	private StaffRepository staffRepository;
 
-	@Autowired
-	private StaffRepositoryImpl customStaffRepo;
 
 	@Autowired
 	private EmailServiceImpl emailServiceImpl;
@@ -65,11 +70,8 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 		return newStaff;
 	}
-
 	@Override
 	public List<Staff> getAllStaffDetails() {
-		log.info("Inside getAllStaffDetails");
-
 		return staffRepository.findAll();
 	}
 
@@ -99,7 +101,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		log.info("Inside disableStaff");
 
 		dbStaff.setDeleted(true);
-//		dbStaff.setActive(false);
+		//		dbStaff.setActive(false);
 
 		staffRepository.save(dbStaff);
 	}
@@ -107,18 +109,87 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	@Override
 	public List<Long> getStaffCount() {
 		long totalEmployee = staffRepository.count();
-		long activeEmployee = customStaffRepo.countByStatus("active");
-		long deactiveEmployee = customStaffRepo.countByStatus("deactive");
-		deactiveEmployee += customStaffRepo.countByStatus("block");
+		long activeEmployee = staffRepository.countByStatus("active");
+		long deactiveEmployee = staffRepository.countByStatus("deactive");
+		deactiveEmployee += staffRepository.countByStatus("block");
 
 		List<Long> countList = new ArrayList<>();
 		countList.add(totalEmployee);
 		countList.add(activeEmployee);
 		countList.add(deactiveEmployee);
-		for (Long count : countList) {
-			log.info(count.toString());
-		}
+
 		return countList;
 	}
+
+	@Override
+	public void editStaffStatus(List<Staff> employeeList) {
+		Staff obj = new Staff();
+		log.info("Inside User Service Mehod to edit Employee status");
+		for (Staff staff : employeeList) {
+			obj = staffRepository.getById(staff.getUserId());
+			obj.setUserId(staff.getUserId());
+			obj.setStatus(staff.getStatus());	
+			staffRepository.save(obj);
+			editStatusEmail(obj);
+		}
+
+	}
+
+	@Override
+	public List<Staff> getAllPhysicians() {
+		return staffRepository.findAllByRoleId(2);
+	}
+
+	public void editStatusEmail(Staff user) {
+		String accountStatus = "";
+
+		if(user.getStatus()=="active")
+			accountStatus= "ACTIVATED";
+
+		else if(user.getStatus()=="deactive")
+			accountStatus= "DEACTIVATED";
+
+		else if(user.getStatus()=="block")
+			accountStatus= "BLOCKED";
+
+		String subject ="YOUR ACCOUNT IS "+accountStatus+" !";
+
+		String body = String.format(""
+				+ "Hello"+user.getFirstName()+",/n"
+				+ "This is an acknowledgement mail for your account with CITY GENERAL HOSPITAL "
+				+ "We wanted to let you know that your account status has been changed\r\n "
+				+ "Your account Status - "+accountStatus+"/n"
+				+ "To see this and other security events for your account, please contact to admin by visiting to hospital"
+				+ "If Your account has been activated , Sign in to your account, "
+				+ "please visit https://localhost:8080/ or Click here. \\r\\n\\r\\n ");
+
+		emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
+
+	}
+	@Override
+	public Map<String, Object> getAllFilteredStaffDetails(Pageable paging) {
+		Page<Staff> pageStaff = staffRepository.findAll(paging);
+		List<Staff> staffs = pageStaff.getContent();
+		Map<String, Object> response = new HashMap<>();
+		response.put("content", staffs);
+		response.put("currentPage", pageStaff.getNumber());
+		response.put("totalItems", pageStaff.getTotalElements());
+		response.put("totalPages", pageStaff.getTotalPages());
+		response.put("last", pageStaff.isLast());
+		response.put("first", pageStaff.isFirst());
+		response.put("sort", pageStaff.getSort());
+		response.put("numberOfElements", pageStaff.getNumberOfElements());
+		response.put("number", pageStaff.getNumber());
+		response.put("empty", pageStaff.isEmpty());
+		response.put("totalElements", pageStaff.getTotalElements());
+		response.put("page", pageStaff.getNumber());
+		response.put("size", pageStaff.getSize());
+		
+		
+		return response;
+
+	}
+
+
 
 }

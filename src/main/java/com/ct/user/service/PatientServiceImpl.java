@@ -1,17 +1,23 @@
 package com.ct.user.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Patient;
+import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.PatientRepository;
-import com.ct.user.repo.PatientRepositoryImpl;
+
 import com.ct.user.utility.EmailServiceImpl;
+
 
 import lombok.extern.java.Log;
 
@@ -21,9 +27,6 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 	@Autowired
 	private PatientRepository patientRepository;
-
-	@Autowired
-	private PatientRepositoryImpl customPatientRepo;
 
 	@Autowired
 	private EmailServiceImpl emailServiceImpl;
@@ -95,10 +98,11 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	@Override
 	public List<Long> getPatientCount() {
 		long totalPatient = patientRepository.count();
-		long activePatient = customPatientRepo.countByStatus("active");
-		long deactivePatient = customPatientRepo.countByStatus("deactive");
-		deactivePatient += customPatientRepo.countByStatus("block");
 
+		long activePatient = patientRepository.countByStatus("active");
+		long deactivePatient = patientRepository.countByStatus("deactive");
+		deactivePatient += patientRepository.countByStatus("block");
+		
 		List<Long> countList = new ArrayList<>();
 		countList.add(totalPatient);
 		countList.add(activePatient);
@@ -109,11 +113,41 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		return countList;
 	}
 
+
+
 	@Override
-	public Patient editPatientStatus(Patient patient) {
-		log.info("Patient Status edited....!");
-		patientRepository.save(patient);
-		return patientRepository.getById(patient.getUserId());
+	public void editPatientStatus(List<Patient> patientList) {
+		Patient obj = new Patient();
+		log.info("Inside User Service Mehod to edit status");
+		for (Patient patient : patientList) {
+			 obj = patientRepository.getById(patient.getUserId());
+				obj.setUserId(patient.getUserId());
+				obj.setStatus(patient.getStatus());	
+				patientRepository.save(obj);
+		}
+	}
+
+	@Override
+	public Map<String, Object> getAllFilteredPatientDetails(Pageable paging) {
+		Page<Patient> pagePatient = patientRepository.findAll(paging);
+		List<Patient> patients = pagePatient.getContent();
+		Map<String, Object> response = new HashMap<>();
+		response.put("content", patients);
+		response.put("currentPage", pagePatient.getNumber());
+		response.put("totalItems", pagePatient.getTotalElements());
+		response.put("totalPages", pagePatient.getTotalPages());
+		response.put("last", pagePatient.isLast());
+		response.put("first", pagePatient.isFirst());
+		response.put("sort", pagePatient.getSort());
+		response.put("numberOfElements", pagePatient.getNumberOfElements());
+		response.put("number", pagePatient.getNumber());
+		response.put("empty", pagePatient.isEmpty());
+		response.put("totalElements", pagePatient.getTotalElements());
+		response.put("page", pagePatient.getNumber());
+		response.put("size", pagePatient.getSize());
+		
+		
+		return response;
 	}
 
 }

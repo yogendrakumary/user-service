@@ -1,9 +1,14 @@
 package com.ct.user.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.constant.Messages;
@@ -129,14 +135,37 @@ public class PatientController {
 	}
 
 	@PutMapping("patient/editstatus")
-	public ResponseEntity<?> editPatientStatus(@RequestBody Patient patient) {
 
+	public ResponseEntity<?> editPatientStatus(@RequestBody List<Patient> patientList ){
+		log.info("Inside User service Controller to edit status");
 		try {
-			return new ResponseEntity<>(patientService.editPatientStatus(patient), HttpStatus.OK);
+			patientService.editPatientStatus(patientList);
+			return new ResponseEntity<Patient>(HttpStatus.OK);
+
 		}
 
 		catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	@GetMapping(value = "/filteredpatients",produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> allPatient(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "3") int size,
+			@RequestParam(defaultValue = "userId") String columnName,
+			@RequestParam(defaultValue = "ASC") String direction
+			){
+		try {
+			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
+			Pageable paging = PageRequest.of(page, size,sort);
+			log.info(paging.toString());
+			return new ResponseEntity<>(patientService.getAllFilteredPatientDetails(paging),HttpStatus.OK);
+			
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+
 }
