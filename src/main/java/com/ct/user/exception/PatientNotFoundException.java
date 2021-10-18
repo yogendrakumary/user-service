@@ -7,7 +7,7 @@ public class PatientNotFoundException extends RuntimeException {
 	}
 
 	public PatientNotFoundException(long id) {
-		super("Could Not Find Patient : " + id);
+		super("Could not find patient : " + id);
 	}
 
 	public PatientNotFoundException(String arg0) {
