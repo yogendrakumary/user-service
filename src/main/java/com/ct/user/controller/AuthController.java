@@ -110,7 +110,7 @@ public class AuthController {
 				.orElseThrow(EmailIdNotRegisteredException::new);
 
 		userServiceImpl.updateCredentials(authDto, user)
-				.orElseThrow(() -> new PasswordNotVerifiedException("Issue While updating passoword"));
+				.orElseThrow(() -> new PasswordNotVerifiedException("Issue while updating passoword"));
 
 		return ResponseEntity.ok(new ResponseModel(Messages.PASSWORD_UPDATED_SUCCESSFULLY));
 	}
@@ -121,5 +121,4 @@ public class AuthController {
 		return ResponseEntity.ok(userServiceImpl.getUserByEmailId(email).isPresent());
 	}
 
-	
 }

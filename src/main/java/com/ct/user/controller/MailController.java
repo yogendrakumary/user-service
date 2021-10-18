@@ -27,6 +27,12 @@ public class MailController {
 //		return ResponseEntity.ok("Send Successfully");
 //	}
 
+	/**
+	 * To send mail from configured
+	 * 
+	 * @param mail
+	 * @return
+	 */
 	@PostMapping("/send")
 	public ResponseEntity<?> sendMail(@RequestBody Mail mail) {
 		log.info("INSIDE sendMail");

@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
 	public Optional<User> getUserByEmailId(String email) throws EmailIdNotRegisteredException {
 		log.info("INSIDE getUserByEmailId");
 		if (email == null || email.trim().isEmpty()) {
-			throw new EmailIdNotRegisteredException("Blank Email Id Provided");
+			throw new EmailIdNotRegisteredException("Blank email Id provided");
 		}
 		return userRepository.findByEmailId(email);
 	}
@@ -181,19 +181,19 @@ public class UserServiceImpl implements UserService {
 		if (user.getAttempt() != -1) {
 
 			if (userDto.getOldPassword() == null || userDto.getOldPassword().trim().isEmpty()) {
-				throw new PasswordNotVerifiedException("Old Password is Blank");
+				throw new PasswordNotVerifiedException("Old password is blank");
 			}
 			// To Verify that old password is matching other wise don't change password
 			// To verify old password is matching with user entered old password
 			if (!userDto.getOldPassword().equals(currentDbPassword)) {
 //				return Optional.empty();
-				throw new PasswordNotVerifiedException("Old Password is not matching");
+				throw new PasswordNotVerifiedException("Old password is not matching");
 			}
 
 			// new Password should not match old password
 			if (newPassoword.equals(currentDbPassword)) {
 //				return Optional.empty();
-				throw new PasswordNotVerifiedException("New Password is Same as Old Password");
+				throw new PasswordNotVerifiedException("New password is same as old password");
 			}
 		}
 
