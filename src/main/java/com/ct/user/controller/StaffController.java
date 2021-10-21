@@ -1,11 +1,9 @@
-package com.ct.user.controller;
+	package com.ct.user.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,9 +18,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+<<<<<<< HEAD
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+=======
+import org.springframework.web.bind.annotation.RequestParam;
+>>>>>>> 19d8c4462191694cfb5504b6f40b285fbf2b7209
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.constant.Messages;

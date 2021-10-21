@@ -9,7 +9,7 @@ package com.ct.user.exception.auth;
 public class PasswordNotVerifiedException extends RuntimeException{
 
 	public PasswordNotVerifiedException() {
-		super("User Password Error");
+		super("User password error");
 	}
 
 	public PasswordNotVerifiedException(String message) {
