@@ -43,7 +43,7 @@ import lombok.extern.java.Log;
 @RestController
 @CrossOrigin(origins = "*")
 @Log
-//@RequestMapping("/users/api")
+@RequestMapping("/users")
 public class PatientController {
 
 	@Autowired
