@@ -20,13 +20,6 @@ public class MailController {
 	@Autowired
 	private EmailServiceImpl emailServiceImpl;
 
-//	@GetMapping("/mail")
-//	public ResponseEntity<String> sendMail() {
-//		log.info("INSIDE mail");
-//		emailServiceImpl.sendSimpleMessage("yyogendra06@gmail.com", "SUBJECT", "THIS IS BODY");
-//		return ResponseEntity.ok("Send Successfully");
-//	}
-
 	/**
 	 * To send mail from configured
 	 * 
