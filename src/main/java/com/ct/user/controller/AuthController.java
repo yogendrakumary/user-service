@@ -25,8 +25,10 @@ import com.ct.user.model.UserDto;
 import com.ct.user.model.validation.ForgetInfo;
 import com.ct.user.model.validation.LoginInfo;
 import com.ct.user.model.validation.UpdateInfo;
+import com.ct.user.response.JwtTokenResponse;
 import com.ct.user.response.ResponseModel;
 import com.ct.user.service.UserService;
+import com.ct.user.utility.JwtTokenUtil;
 
 import lombok.extern.java.Log;
 
@@ -39,6 +41,9 @@ public class AuthController {
 
 	@Autowired
 	private UserService userServiceImpl;
+
+	@Autowired
+	private JwtTokenUtil jwtTokenUtil;
 
 	/**
 	 * User Verification with email and password
@@ -67,7 +72,9 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticatedUser);
 		}
 
-		return ResponseEntity.ok().body(authenticatedUser);
+		final String token = jwtTokenUtil.generateToken(user);
+
+		return ResponseEntity.ok().body(new JwtTokenResponse(authenticatedUser, token));
 	}
 
 	/**
