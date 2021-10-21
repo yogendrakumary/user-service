@@ -8,7 +8,10 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Patient;
@@ -126,7 +129,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	}
 
 	@Override
-	public Map<String, Object> getAllFilteredPatientDetails(Pageable paging) {
+	public Map<String, Object> getAllPatient(Pageable paging) {
 		Page<Patient> pagePatient = patientRepository.findAll(paging);
 		List<Patient> patients = pagePatient.getContent();
 		Map<String, Object> response = new HashMap<>();
@@ -143,6 +146,32 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		response.put("totalElements", pagePatient.getTotalElements());
 		response.put("page", pagePatient.getNumber());
 		response.put("size", pagePatient.getSize());
+		
+		
+		return response;
+	}
+
+	@Override
+	public Map<String, Object> getFilteredPatientDetails(String filterValue) {
+		Sort sort = Sort.by(Sort.Direction.ASC, "firstName");
+		Pageable paging = PageRequest.of(1, 5,sort);
+		//Page<Patient> pagePatient = patientRepository.findAll(paging,filterValue);
+		List<Patient> patients = patientRepository.findAll();
+		//List<Patient> patients = pagePatient.getContent();
+		Map<String, Object> response = new HashMap<>();
+		response.put("content", patients);
+//		response.put("currentPage", pagePatient.getNumber());
+//		response.put("totalItems", pagePatient.getTotalElements());
+//		response.put("totalPages", pagePatient.getTotalPages());
+//		response.put("last", pagePatient.isLast());
+//		response.put("first", pagePatient.isFirst());
+//		response.put("sort", pagePatient.getSort());
+//		response.put("numberOfElements", pagePatient.getNumberOfElements());
+//		response.put("number", pagePatient.getNumber());
+//		response.put("empty", pagePatient.isEmpty());
+//		response.put("totalElements", pagePatient.getTotalElements());
+//		response.put("page", pagePatient.getNumber());
+//		response.put("size", pagePatient.getSize());
 		
 		
 		return response;

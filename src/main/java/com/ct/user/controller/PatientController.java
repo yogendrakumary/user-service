@@ -18,10 +18,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-<<<<<<< HEAD
+
 import org.springframework.web.bind.annotation.RequestMapping;
-=======
->>>>>>> 19d8c4462191694cfb5504b6f40b285fbf2b7209
+
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -152,7 +151,7 @@ public class PatientController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@GetMapping(value = "/filteredpatients",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/patient-list",produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> allPatient(
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "3") int size,
@@ -163,7 +162,7 @@ public class PatientController {
 			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
 			Pageable paging = PageRequest.of(page, size,sort);
 			log.info(paging.toString());
-			return new ResponseEntity<>(patientService.getAllFilteredPatientDetails(paging),HttpStatus.OK);
+			return new ResponseEntity<>(patientService.getAllPatient(paging),HttpStatus.OK);
 			
 		}
 		catch(Exception e) {
@@ -171,5 +170,19 @@ public class PatientController {
 		}
 		
 	}
+	@GetMapping(value = "/filteredpatients",produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> FilteredPatient(
+			@RequestParam(defaultValue = "") String filterValue
+			){
+		try {
+			return new ResponseEntity<>(patientService.getFilteredPatientDetails(filterValue),HttpStatus.OK);
+			
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+
 
 }
