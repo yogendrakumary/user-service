@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,7 +36,7 @@ import lombok.extern.java.Log;
 @RestController
 @CrossOrigin(origins = "*")
 @Log
-//@RequestMapping("/users/api")
+@RequestMapping("/users")
 public class StaffController {
 
 	@Autowired
@@ -138,10 +139,11 @@ public class StaffController {
 	 * and send it the staff service
 	 * */
 	@PutMapping("employee/editstatus")
-	public ResponseEntity<?> editStaffStatus(@RequestBody List<Staff> EmployeeList ){
+	public ResponseEntity<?> editStaffStatus(@RequestBody List<Staff> employeeList ){
+		log.info(employeeList.toString());
 		log.info("Inside User service Controller to edit status");
-		try {
-			staffService.editStaffStatus(EmployeeList);
+		 try{
+			staffService.editStaffStatus(employeeList);
 			return new ResponseEntity<String>("Status Edited",HttpStatus.OK);
 		}
 		

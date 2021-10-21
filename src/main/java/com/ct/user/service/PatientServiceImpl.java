@@ -107,9 +107,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		countList.add(totalPatient);
 		countList.add(activePatient);
 		countList.add(deactivePatient);
-		for (Long count : countList) {
-			log.info(count.toString());
-		}
+		
 		return countList;
 	}
 

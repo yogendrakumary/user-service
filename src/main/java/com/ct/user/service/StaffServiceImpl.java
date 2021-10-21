@@ -125,6 +125,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	public void editStaffStatus(List<Staff> employeeList) {
 		Staff obj = new Staff();
 		log.info("Inside User Service Mehod to edit Employee status");
+		log.info(employeeList.toString());
 		for (Staff staff : employeeList) {
 			obj = staffRepository.getById(staff.getUserId());
 			obj.setUserId(staff.getUserId());
@@ -163,7 +164,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 				+ "If Your account has been activated , Sign in to your account, "
 				+ "please visit https://localhost:8080/ or Click here. \\r\\n\\r\\n ");
 
-		emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
+		//emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
 
 	}
 	@Override
