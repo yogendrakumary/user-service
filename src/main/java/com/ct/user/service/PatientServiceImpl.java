@@ -125,6 +125,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 				obj.setUserId(patient.getUserId());
 				obj.setStatus(patient.getStatus());	
 				patientRepository.save(obj);
+				editStatusEmail(obj);
 		}
 	}
 
@@ -175,6 +176,34 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		
 		
 		return response;
+	}
+	public void editStatusEmail(Patient patient) {
+		log.info(patient.getStatus());
+		log.info(patient.getFirstName());
+		String accountStatus = "";
+
+		if(patient.getStatus()=="active")
+			accountStatus= "ACTIVATED";
+
+		else if(patient.getStatus()=="deactive")
+			accountStatus= "DEACTIVATED";
+
+		else if(patient.getStatus()=="block")
+			accountStatus= "BLOCKED";
+
+		String subject ="YOUR ACCOUNT IS "+accountStatus+" !";
+
+		String body = String.format(""
+				+ "Hello"+patient.getFirstName()+",/n"
+				+ "This is an acknowledgement mail for your account with CT GENERAL HOSPITAL "
+				+ "We wanted to let you know that your account status has been changed\r\n "
+				+ "Your account Status - "+accountStatus+"/n"
+				+ "To see this and other security events for your account, please contact to admin by visiting to hospital"
+				+ "If Your account has been activated , Sign in to your account, "
+				+ "please visit https://localhost:8080/ or Click here. \\r\\n\\r\\n ");
+
+		emailServiceImpl.sendSimpleMessage(patient.getEmail(), subject, body);
+
 	}
 
 }

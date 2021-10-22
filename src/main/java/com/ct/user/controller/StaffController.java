@@ -41,7 +41,6 @@ import lombok.extern.java.Log;
 @RestController
 @CrossOrigin(origins = "*")
 @Log
-@RequestMapping("/users")
 public class StaffController {
 
 	@Autowired
@@ -165,7 +164,7 @@ public class StaffController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@GetMapping(value = "/filteredemployees",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "employees/filteredemployees",produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> allEmployee(
 		
 			@RequestParam(defaultValue = "0") int page,

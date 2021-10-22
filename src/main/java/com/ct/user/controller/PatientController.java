@@ -44,7 +44,6 @@ import lombok.extern.java.Log;
 @RestController
 @CrossOrigin(origins = "*")
 @Log
-@RequestMapping("/users")
 public class PatientController {
 
 	@Autowired
@@ -151,7 +150,7 @@ public class PatientController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@GetMapping(value = "/patient-list",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "patient/patient-list",produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> allPatient(
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "3") int size,
@@ -170,7 +169,7 @@ public class PatientController {
 		}
 		
 	}
-	@GetMapping(value = "/filteredpatients",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "patient/filteredpatients",produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> FilteredPatient(
 			@RequestParam(defaultValue = "") String filterValue
 			){
