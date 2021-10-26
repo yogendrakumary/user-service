@@ -48,7 +48,6 @@ public class PatientController {
 	@Autowired
 	private PatientService patientService;
 
-
 	/**
 	 * Return All Patients
 	 * 
@@ -69,6 +68,22 @@ public class PatientController {
 	 */
 	@PostMapping("/patients")
 	public ResponseEntity<ResponseModel> newPatient(
+			@Validated(value = PatientInfo.class) @RequestBody UserDto newPatient) {
+		log.info("INSIDE newPatient");
+
+		// Need to verify email is already exists if exists send them user exists with
+		// email id, you can forget
+		patientService.getUserByEmailId(newPatient.getEmail()).ifPresent(u -> {
+			throw new EmailIdAlreadyRegisteredException();
+		});
+
+		patientService.save(newPatient);
+
+		return ResponseEntity.ok(new ResponseModel(Messages.PATIENT_ADDED_SUCCESSFULLY));
+	}
+
+	@PostMapping("/patients/signup")
+	public ResponseEntity<ResponseModel> newSignupPatient(
 			@Validated(value = PatientInfo.class) @RequestBody UserDto newPatient) {
 		log.info("INSIDE newPatient");
 
@@ -137,7 +152,7 @@ public class PatientController {
 
 	@PutMapping("patient/editstatus")
 
-	public ResponseEntity<?> editPatientStatus(@RequestBody List<Patient> patientList ){
+	public ResponseEntity<?> editPatientStatus(@RequestBody List<Patient> patientList) {
 		log.info("Inside User service Controller to edit status");
 		try {
 			patientService.editPatientStatus(patientList);
@@ -149,24 +164,21 @@ public class PatientController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@GetMapping(value = "/filteredpatients",produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Map<String, Object>> allPatient(
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "3") int size,
-			@RequestParam(defaultValue = "userId") String columnName,
-			@RequestParam(defaultValue = "ASC") String direction
-			){
+
+	@GetMapping(value = "/filteredpatients", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> allPatient(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "3") int size, @RequestParam(defaultValue = "userId") String columnName,
+			@RequestParam(defaultValue = "ASC") String direction) {
 		try {
 			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
-			Pageable paging = PageRequest.of(page, size,sort);
+			Pageable paging = PageRequest.of(page, size, sort);
 			log.info(paging.toString());
-			return new ResponseEntity<>(patientService.getAllFilteredPatientDetails(paging),HttpStatus.OK);
-			
+			return new ResponseEntity<>(patientService.getAllFilteredPatientDetails(paging), HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		catch(Exception e) {
-			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
+
 	}
 
 }
