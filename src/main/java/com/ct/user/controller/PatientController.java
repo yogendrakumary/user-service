@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +44,6 @@ import lombok.extern.java.Log;
 @RestController
 @CrossOrigin(origins = "*")
 @Log
-@RequestMapping("/users")
 public class PatientController {
 
 	@Autowired
@@ -156,7 +157,7 @@ public class PatientController {
 		log.info("Inside User service Controller to edit status");
 		try {
 			patientService.editPatientStatus(patientList);
-			return new ResponseEntity<Patient>(HttpStatus.OK);
+			return new ResponseEntity<>(HttpStatus.OK);
 
 		}
 
@@ -165,20 +166,45 @@ public class PatientController {
 		}
 	}
 
-	@GetMapping(value = "/filteredpatients", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "patient/patient-list", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> allPatient(@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "3") int size, @RequestParam(defaultValue = "userId") String columnName,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "userId") String columnName,
 			@RequestParam(defaultValue = "ASC") String direction) {
 		try {
 			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
 			Pageable paging = PageRequest.of(page, size, sort);
 			log.info(paging.toString());
-			return new ResponseEntity<>(patientService.getAllFilteredPatientDetails(paging), HttpStatus.OK);
+
+			return new ResponseEntity<>(patientService.getAllPatient(paging), HttpStatus.OK);
 
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
+	}
+
+	@GetMapping(value = "patient/filteredpatients", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> FilteredPatient(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "ASC") String direction,
+			@RequestParam(defaultValue = "") String filterValue) {
+		try {
+			Sort sort = Sort.by(Sort.Direction.fromString(direction), "first_name");
+			Pageable paging = PageRequest.of(page, size, sort);
+			return new ResponseEntity<>(patientService.getFilteredPatientDetails(filterValue, paging), HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+	@GetMapping(value = "patient/allactivepatient")
+	public ResponseEntity<?> getAllActivePatientEmail() {
+		try {
+			return new ResponseEntity<>(patientService.getAllActivePatients(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }

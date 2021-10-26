@@ -8,7 +8,10 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Patient;
@@ -122,11 +125,12 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 				obj.setUserId(patient.getUserId());
 				obj.setStatus(patient.getStatus());	
 				patientRepository.save(obj);
+				editStatusEmail(obj);
 		}
 	}
 
 	@Override
-	public Map<String, Object> getAllFilteredPatientDetails(Pageable paging) {
+	public Map<String, Object> getAllPatient(Pageable paging) {
 		Page<Patient> pagePatient = patientRepository.findAll(paging);
 		List<Patient> patients = pagePatient.getContent();
 		Map<String, Object> response = new HashMap<>();
@@ -146,6 +150,61 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		
 		
 		return response;
+	}
+
+	@Override
+	public Map<String, Object> getFilteredPatientDetails(String filterValue,Pageable paging) {
+		Page<Patient> pagePatient = patientRepository.findAll(filterValue,paging);
+		log.info(pagePatient.toString());
+		List<Patient> patients = pagePatient.getContent();
+		Map<String, Object> response = new HashMap<>();
+		response.put("content", patients);
+		response.put("currentPage", pagePatient.getNumber());
+		response.put("totalItems", pagePatient.getTotalElements());
+		response.put("totalPages", pagePatient.getTotalPages());
+		response.put("last", pagePatient.isLast());
+		response.put("first", pagePatient.isFirst());
+		response.put("sort", pagePatient.getSort());
+		response.put("numberOfElements", pagePatient.getNumberOfElements());
+		response.put("number", pagePatient.getNumber());
+		response.put("empty", pagePatient.isEmpty());
+		response.put("totalElements", pagePatient.getTotalElements());
+		response.put("page", pagePatient.getNumber());
+		response.put("size", pagePatient.getSize());
+		return response;
+	}
+	public void editStatusEmail(Patient patient) {
+		log.info(patient.getStatus());
+		log.info(patient.getFirstName());
+		String accountStatus = "";
+
+		if(patient.getStatus()=="active")
+			accountStatus= "ACTIVATED";
+
+		else if(patient.getStatus()=="deactive")
+			accountStatus= "DEACTIVATED";
+
+		else if(patient.getStatus()=="block")
+			accountStatus= "BLOCKED";
+
+		String subject ="YOUR ACCOUNT IS "+accountStatus+" !";
+
+		String body = String.format(""
+				+ "Hello"+patient.getFirstName()+",/n"
+				+ "This is an acknowledgement mail for your account with CT GENERAL HOSPITAL "
+				+ "We wanted to let you know that your account status has been changed\r\n "
+				+ "Your account Status - "+accountStatus+"/n"
+				+ "To see this and other security events for your account, please contact to admin by visiting to hospital"
+				+ "If Your account has been activated , Sign in to your account, "
+				+ "please visit https://localhost:8080/ or Click here. \\r\\n\\r\\n ");
+
+		emailServiceImpl.sendSimpleMessage(patient.getEmail(), subject, body);
+
+	}
+
+	@Override
+	public List<Patient> getAllActivePatients() {
+		return patientRepository.findAllByStatus("active");
 	}
 
 }

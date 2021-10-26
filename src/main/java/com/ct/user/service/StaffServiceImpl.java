@@ -125,7 +125,6 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	public void editStaffStatus(List<Staff> employeeList) {
 		Staff obj = new Staff();
 		log.info("Inside User Service Mehod to edit Employee status");
-		log.info(employeeList.toString());
 		for (Staff staff : employeeList) {
 			obj = staffRepository.getById(staff.getUserId());
 			obj.setUserId(staff.getUserId());
@@ -144,31 +143,34 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	public void editStatusEmail(Staff user) {
 		String accountStatus = "";
 
-		if(user.getStatus()=="active")
+		if(user.getStatus().equals("active"))
 			accountStatus= "ACTIVATED";
 
-		else if(user.getStatus()=="deactive")
+		else if(user.getStatus().equals("deactive"))
 			accountStatus= "DEACTIVATED";
 
-		else if(user.getStatus()=="block")
+		else if(user.getStatus().equals("block"))
 			accountStatus= "BLOCKED";
 
 		String subject ="YOUR ACCOUNT IS "+accountStatus+" !";
 
 		String body = String.format(""
-				+ "Hello"+user.getFirstName()+",/n"
+				+ "Hello"+user.getFirstName()+",\n"
 				+ "This is an acknowledgement mail for your account with CITY GENERAL HOSPITAL "
 				+ "We wanted to let you know that your account status has been changed\r\n "
-				+ "Your account Status - "+accountStatus+"/n"
-				+ "To see this and other security events for your account, please contact to admin by visiting to hospital"
-				+ "If Your account has been activated , Sign in to your account, "
-				+ "please visit https://localhost:8080/ or Click here. \\r\\n\\r\\n ");
-
-		//emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
+				+ "Your account Status - "+accountStatus+"\n");
+				
+				if(user.getStatus().equals("active")) {
+				body += "Sign in to your account, ";
+				body += "please visit https://localhost:4200/ or Click here.\n";
+				}
+				body += "To see this and other security events for your account, please contact to admin by visiting to hospital";
+				
+		emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
 
 	}
 	@Override
-	public Map<String, Object> getAllFilteredStaffDetails(Pageable paging) {
+	public Map<String, Object> getAllEmployeeDetails(Pageable paging) {
 		Page<Staff> pageStaff = staffRepository.findAll(paging);
 		List<Staff> staffs = pageStaff.getContent();
 		Map<String, Object> response = new HashMap<>();
@@ -189,6 +191,33 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		
 		return response;
 
+	}
+	@Override
+	public Map<String, Object> getFilteredEmployeeDetails(String filterValue, Pageable paging) {
+		Page<Staff> pageStaff = staffRepository.findAll(filterValue,paging);
+		log.info(filterValue);
+		List<Staff> staffs = pageStaff.getContent();
+		Map<String, Object> response = new HashMap<>();
+		response.put("content", staffs);
+		response.put("currentPage", pageStaff.getNumber());
+		response.put("totalItems", pageStaff.getTotalElements());
+		response.put("totalPages", pageStaff.getTotalPages());
+		response.put("last", pageStaff.isLast());
+		response.put("first", pageStaff.isFirst());
+		response.put("sort", pageStaff.getSort());
+		response.put("numberOfElements", pageStaff.getNumberOfElements());
+		response.put("number", pageStaff.getNumber());
+		response.put("empty", pageStaff.isEmpty());
+		response.put("totalElements", pageStaff.getTotalElements());
+		response.put("page", pageStaff.getNumber());
+		response.put("size", pageStaff.getSize());
+		return response;
+	}
+	
+	@Override
+	public List<Staff> getAllActiveEmployees() {
+		return staffRepository.findAllByStatus("active");
+		
 	}
 
 

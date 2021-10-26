@@ -54,6 +54,11 @@ public interface PatientService extends UserService {
 
 	void editPatientStatus(List<Patient> patientList);
 
-	Map<String, Object> getAllFilteredPatientDetails(Pageable paging);
+	Map<String, Object> getAllPatient(Pageable paging);
+
+	Map<String, Object> getFilteredPatientDetails(String filterValue, Pageable paging);
+
+
+	List<Patient> getAllActivePatients();
 
 }

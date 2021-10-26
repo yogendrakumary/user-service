@@ -29,15 +29,16 @@ public class User {
 	@Id
 	@SequenceGenerator(name = "myKeySeq", sequenceName = "user_sequences ", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "myKeySeq")
+	@Column(name="user_id")
 	private Long userId;
 
 	@Column(length = 5, nullable = false)
 	private String title;
 
-	@Column(length = 50, nullable = false)
+	@Column(name = "first_name",length = 50, nullable = false)
 	private String firstName;
 
-	@Column(length = 50, nullable = false)
+	@Column(name = "last_name",length = 50, nullable = false)
 	private String lastName;
 
 	@Column(length = 50, nullable = false, unique = true)
@@ -50,7 +51,7 @@ public class User {
 
 	private String password;
 
-	@Column(length = 2)
+	@Column(name = "attempt",length = 2)
 	@ColumnDefault(value = "0")
 	private Integer attempt;
 
