@@ -219,7 +219,9 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		return staffRepository.findAllByStatus("active");
 		
 	}
-
+	public Staff getEmployeeId(Integer id) {
+		return  staffRepository.findByempId(id);
+	}
 
 
 }
