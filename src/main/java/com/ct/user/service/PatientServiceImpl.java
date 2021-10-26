@@ -153,28 +153,24 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	}
 
 	@Override
-	public Map<String, Object> getFilteredPatientDetails(String filterValue) {
-		Sort sort = Sort.by(Sort.Direction.ASC, "firstName");
-		Pageable paging = PageRequest.of(1, 5,sort);
-		//Page<Patient> pagePatient = patientRepository.findAll(paging,filterValue);
-		List<Patient> patients = patientRepository.findAll();
-		//List<Patient> patients = pagePatient.getContent();
+	public Map<String, Object> getFilteredPatientDetails(String filterValue,Pageable paging) {
+		Page<Patient> pagePatient = patientRepository.findAll(filterValue,paging);
+		log.info(pagePatient.toString());
+		List<Patient> patients = pagePatient.getContent();
 		Map<String, Object> response = new HashMap<>();
 		response.put("content", patients);
-//		response.put("currentPage", pagePatient.getNumber());
-//		response.put("totalItems", pagePatient.getTotalElements());
-//		response.put("totalPages", pagePatient.getTotalPages());
-//		response.put("last", pagePatient.isLast());
-//		response.put("first", pagePatient.isFirst());
-//		response.put("sort", pagePatient.getSort());
-//		response.put("numberOfElements", pagePatient.getNumberOfElements());
-//		response.put("number", pagePatient.getNumber());
-//		response.put("empty", pagePatient.isEmpty());
-//		response.put("totalElements", pagePatient.getTotalElements());
-//		response.put("page", pagePatient.getNumber());
-//		response.put("size", pagePatient.getSize());
-		
-		
+		response.put("currentPage", pagePatient.getNumber());
+		response.put("totalItems", pagePatient.getTotalElements());
+		response.put("totalPages", pagePatient.getTotalPages());
+		response.put("last", pagePatient.isLast());
+		response.put("first", pagePatient.isFirst());
+		response.put("sort", pagePatient.getSort());
+		response.put("numberOfElements", pagePatient.getNumberOfElements());
+		response.put("number", pagePatient.getNumber());
+		response.put("empty", pagePatient.isEmpty());
+		response.put("totalElements", pagePatient.getTotalElements());
+		response.put("page", pagePatient.getNumber());
+		response.put("size", pagePatient.getSize());
 		return response;
 	}
 	public void editStatusEmail(Patient patient) {
@@ -204,6 +200,11 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 
 		emailServiceImpl.sendSimpleMessage(patient.getEmail(), subject, body);
 
+	}
+
+	@Override
+	public List<Patient> getAllActivePatients() {
+		return patientRepository.findAllByStatus("active");
 	}
 
 }

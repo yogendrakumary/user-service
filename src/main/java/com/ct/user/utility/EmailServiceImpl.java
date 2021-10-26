@@ -5,6 +5,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import jdk.internal.org.jline.utils.Log;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Utility For Mail
  * 
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@Slf4j
 public class EmailServiceImpl {
 	
 	@Autowired
@@ -32,5 +36,16 @@ public class EmailServiceImpl {
 		message.setSubject(subject);
 		message.setText(text);
 		emailSender.send(message);
+	}
+	
+
+	public void sendMultipleMessage(String subject, String body, String[] multipleTo) {
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setFrom("noreply@ctgeneralhospital.com");
+		message.setTo(multipleTo);
+		message.setSubject(subject);
+		message.setText(body);
+		emailSender.send(message);
+		
 	}
 }

@@ -1,5 +1,6 @@
 package com.ct.user.model;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 

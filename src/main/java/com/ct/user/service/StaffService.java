@@ -57,6 +57,10 @@ public interface StaffService extends UserService {
 
 	List<Staff> getAllPhysicians();
 
-	Map<String, Object> getAllFilteredStaffDetails(Pageable paging);
+	Map<String, Object> getAllEmployeeDetails(Pageable paging);
+
+	Map<String, Object> getFilteredEmployeeDetails(String filterValue, Pageable paging);
+
+	List<Staff> getAllActiveEmployees();
 
 }

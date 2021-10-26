@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -164,7 +165,7 @@ public class StaffController {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@GetMapping(value = "employees/filteredemployees",produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "employees/user-list",produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Map<String, Object>> allEmployee(
 		
 			@RequestParam(defaultValue = "0") int page,
@@ -176,13 +177,41 @@ public class StaffController {
 			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
 			Pageable paging = PageRequest.of(page, size,sort);	
 			log.info(paging.toString());
-			return new ResponseEntity<>(staffService.getAllFilteredStaffDetails(paging),HttpStatus.OK);
+			return new ResponseEntity<>(staffService.getAllEmployeeDetails(paging),HttpStatus.OK);
 			
 		}
 		catch(Exception e) {
 			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
+	}
+	@GetMapping(value = "employees/filteredstaff",produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> FilteredEmployee(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size,
+			@RequestParam(defaultValue = "ASC") String direction,
+			@RequestParam(defaultValue = "")  String filterValue
+			){
+		try {
+		Sort sort = Sort.by(Sort.Direction.fromString(direction), "first_name");
+		Pageable paging = PageRequest.of(page, size,sort);
+			return new ResponseEntity<>(staffService.getFilteredEmployeeDetails(filterValue,paging),HttpStatus.OK);
+			
+		}
+		catch(Exception e) {	
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+
+	@GetMapping(value="employees/allactiveemployees")
+	public ResponseEntity<?> getAllActiveEmployeeEmail(){
+		try {
+			return new ResponseEntity<List<Staff>>(staffService.getAllActiveEmployees(),HttpStatus.OK);
+		}
+		catch(Exception e) {
+			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 
