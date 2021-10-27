@@ -18,6 +18,7 @@ import com.ct.user.model.Staff;
 import com.ct.user.model.User;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.UserRepository;
+import com.ct.user.response.UserResponse;
 import com.ct.user.utility.EmailServiceImpl;
 
 import lombok.extern.java.Log;
@@ -204,6 +205,25 @@ public class UserServiceImpl implements UserService {
 		UserDto responseUserDto = this.mapUserToUserDto(user);
 
 		return Optional.of(responseUserDto);
+	}
+
+	@Override
+	public UserResponse getUserResponseFromUserDto(UserDto authenticatedUser) {
+		UserResponse userResponse = new UserResponse();
+
+		userResponse.setUserId(authenticatedUser.getUserId());
+		userResponse.setTitle(authenticatedUser.getTitle());
+		userResponse.setFirstName(authenticatedUser.getFirstName());
+		userResponse.setLastName(authenticatedUser.getLastName());
+		userResponse.setEmail(authenticatedUser.getEmail());
+		userResponse.setBirthDate(authenticatedUser.getBirthDate());
+		userResponse.setAttempt(authenticatedUser.getAttempt());
+		userResponse.setRoleId(authenticatedUser.getRoleId());
+		userResponse.setRoleName(authenticatedUser.getRoleName());
+		userResponse.setContactNo(authenticatedUser.getContactNo());
+		userResponse.setEmpId(authenticatedUser.getEmpId());
+
+		return userResponse;
 	}
 
 }
