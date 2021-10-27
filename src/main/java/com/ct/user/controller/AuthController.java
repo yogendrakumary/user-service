@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,13 +26,14 @@ import com.ct.user.model.validation.LoginInfo;
 import com.ct.user.model.validation.UpdateInfo;
 import com.ct.user.response.JwtTokenResponse;
 import com.ct.user.response.ResponseModel;
+import com.ct.user.response.UserResponse;
 import com.ct.user.service.UserService;
 import com.ct.user.utility.JwtTokenUtil;
 
 import lombok.extern.java.Log;
 
 @RestController
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @RequestMapping("/auth")
 @Log
 //@RequestMapping("/users/api/auth")
@@ -68,13 +68,16 @@ public class AuthController {
 
 		UserDto authenticatedUser = userServiceImpl.authenticate(authDto, user).orElseThrow(UserNotFoundException::new);
 
+		UserResponse userResponse = userServiceImpl.getUserResponseFromUserDto(authenticatedUser);
+
 		if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT || authenticatedUser.getRoleId() == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticatedUser);
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
 		}
 
 		final String token = jwtTokenUtil.generateToken(user);
+		userResponse.setAccessToken(token);
 
-		return ResponseEntity.ok().body(new JwtTokenResponse(authenticatedUser, token));
+		return ResponseEntity.ok().body(userResponse);
 	}
 
 	/**
