@@ -8,6 +8,7 @@ import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.model.User;
 import com.ct.user.model.UserDto;
+import com.ct.user.response.UserResponse;
 
 public interface UserService {
 
@@ -67,5 +68,7 @@ public interface UserService {
 	 * @return
 	 */
 	Optional<User> getUserByEmailId(String email);
+
+	UserResponse getUserResponseFromUserDto(UserDto authenticatedUser);
 
 }
