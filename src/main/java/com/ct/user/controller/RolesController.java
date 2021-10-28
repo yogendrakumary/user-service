@@ -13,7 +13,7 @@ import com.ct.user.model.Role;
 import com.ct.user.service.RolesService;
 
 @RestController
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 //@RequestMapping("/users/api")
 public class RolesController {
 
@@ -24,6 +24,7 @@ public class RolesController {
 	public List<Role> all() {
 		return rolesService.getAllRoles();
 	}
+
 	@GetMapping("/roles/{id}")
 	public Optional<Role> getRole(@PathVariable int id) {
 		return rolesService.getRole(id);

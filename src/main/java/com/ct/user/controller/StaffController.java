@@ -34,7 +34,7 @@ import com.ct.user.service.StaffService;
 import lombok.extern.java.Log;
 
 @RestController
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @Log
 public class StaffController {
 
