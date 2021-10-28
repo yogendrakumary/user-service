@@ -39,7 +39,7 @@ import lombok.extern.java.Log;
  *
  */
 @RestController
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @Log
 public class PatientController {
 
