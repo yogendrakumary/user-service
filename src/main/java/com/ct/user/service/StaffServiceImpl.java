@@ -10,13 +10,13 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.StaffRepository;
 import com.ct.user.utility.EmailServiceImpl;
+import com.ct.user.utility.Utility;
 
 import lombok.extern.java.Log;
 
@@ -37,7 +37,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		// TO fethc last empId
 		Integer lastEmpId = staffRepository.getLastEmployeeId().orElse(0);
 
-		String otp = RandomStringUtils.randomAlphabetic(10);
+		String otp = Utility.generateOtp();
 
 		Staff newStaff = new Staff();
 

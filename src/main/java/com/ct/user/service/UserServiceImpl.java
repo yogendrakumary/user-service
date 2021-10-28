@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ import com.ct.user.model.UserDto;
 import com.ct.user.repo.UserRepository;
 import com.ct.user.response.UserResponse;
 import com.ct.user.utility.EmailServiceImpl;
+import com.ct.user.utility.Utility;
 
 import lombok.extern.java.Log;
 
@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
 	public Optional<UserDto> resetUser(User user) {
 		log.info("INSIDE resetUser");
 
-		String resetPassword = RandomStringUtils.randomAlphabetic(10);
+		String resetPassword = Utility.generateOtp();
 
 		user.setAttempt(-1);
 		user.setPassword(resetPassword);
