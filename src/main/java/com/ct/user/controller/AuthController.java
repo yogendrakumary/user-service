@@ -24,7 +24,6 @@ import com.ct.user.model.UserDto;
 import com.ct.user.model.validation.ForgetInfo;
 import com.ct.user.model.validation.LoginInfo;
 import com.ct.user.model.validation.UpdateInfo;
-import com.ct.user.response.JwtTokenResponse;
 import com.ct.user.response.ResponseModel;
 import com.ct.user.response.UserResponse;
 import com.ct.user.service.UserService;

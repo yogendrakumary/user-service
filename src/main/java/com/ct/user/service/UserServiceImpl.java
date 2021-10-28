@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -148,7 +149,7 @@ public class UserServiceImpl implements UserService {
 	public Optional<UserDto> resetUser(User user) {
 		log.info("INSIDE resetUser");
 
-		String resetPassword = "Welcome@123";
+		String resetPassword = RandomStringUtils.randomAlphabetic(10);
 
 		user.setAttempt(-1);
 		user.setPassword(resetPassword);
