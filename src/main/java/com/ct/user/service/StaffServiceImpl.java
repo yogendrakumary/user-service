@@ -6,19 +6,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.StaffRepository;
-
-
 import com.ct.user.utility.EmailServiceImpl;
+
 import com.ct.user.utility.RandomPasswordGenerator;
+
+import com.ct.user.utility.Utility;
+
 
 import lombok.extern.java.Log;
 
@@ -28,7 +30,6 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 	@Autowired
 	private StaffRepository staffRepository;
-
 
 	@Autowired
 	private EmailServiceImpl emailServiceImpl;
@@ -40,7 +41,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		// TO fethc last empId
 		Integer lastEmpId = staffRepository.getLastEmployeeId().orElse(0);
 
-		String otp = "Welcome@123";
+		String otp = Utility.generateOtp();
 
 		Staff newStaff = new Staff();
 
@@ -51,7 +52,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		newStaff.setRoleId(staff.getRoleId());
 		newStaff.setBirthDate(staff.getBirthDate());
 
-		newStaff.setPassword(otp);
+		newStaff.setPassword(passwordEncoder.encode(otp));
 		newStaff.setEmpId(lastEmpId + 1);
 
 		newStaff.setAttempt(-1);
@@ -70,6 +71,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 		return newStaff;
 	}
+
 	@Override
 	public List<Staff> getAllStaffDetails() {
 		return staffRepository.findAll();
@@ -101,7 +103,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		log.info("Inside disableStaff");
 
 		dbStaff.setDeleted(true);
-		//		dbStaff.setActive(false);
+		// dbStaff.setActive(false);
 
 		staffRepository.save(dbStaff);
 	}
@@ -145,16 +147,16 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	public void editStatusEmail(Staff user) {
 		String accountStatus = "";
 
-		if(user.getStatus().equals("active"))
-			accountStatus= "ACTIVATED";
+		if (user.getStatus().equals("active"))
+			accountStatus = "ACTIVATED";
 
-		else if(user.getStatus().equals("deactive"))
-			accountStatus= "DEACTIVATED";
+		else if (user.getStatus().equals("deactive"))
+			accountStatus = "DEACTIVATED";
 
-		else if(user.getStatus().equals("block"))
-			accountStatus= "BLOCKED";
+		else if (user.getStatus().equals("block"))
+			accountStatus = "BLOCKED";
 
-		String subject ="YOUR ACCOUNT IS "+accountStatus+" !";
+		String subject = "YOUR ACCOUNT IS " + accountStatus + " !";
 
 		String body = String.format(""
 				+ "Hello "+user.getFirstName()+",\n"
@@ -175,9 +177,11 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 				body +="\n";
 				body+= "ADMIN";
 				body +="CT General Hospital";
+
 		emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
 
 	}
+
 	@Override
 	public Map<String, Object> getAllEmployeeDetails(Pageable paging) {
 		Page<Staff> pageStaff = staffRepository.findAll(paging);
@@ -196,14 +200,14 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		response.put("totalElements", pageStaff.getTotalElements());
 		response.put("page", pageStaff.getNumber());
 		response.put("size", pageStaff.getSize());
-		
-		
+
 		return response;
 
 	}
+
 	@Override
 	public Map<String, Object> getFilteredEmployeeDetails(String filterValue, Pageable paging) {
-		Page<Staff> pageStaff = staffRepository.findAll(filterValue,paging);
+		Page<Staff> pageStaff = staffRepository.findAll(filterValue, paging);
 		log.info(filterValue);
 		List<Staff> staffs = pageStaff.getContent();
 		Map<String, Object> response = new HashMap<>();
@@ -222,15 +226,14 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		response.put("size", pageStaff.getSize());
 		return response;
 	}
-	
+
 	@Override
 	public List<Staff> getAllActiveEmployees() {
 		return staffRepository.findAllByStatus("active");
-		
-	}
-	public Staff getEmployeeId(Integer id) {
-		return  staffRepository.findByempId(id);
 	}
 
+	public Staff getEmployeeId(Integer id) {
+		return staffRepository.findByempId(id);
+	}
 
 }

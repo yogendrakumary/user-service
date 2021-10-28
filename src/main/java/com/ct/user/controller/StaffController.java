@@ -1,4 +1,4 @@
-	package com.ct.user.controller;
+package com.ct.user.controller;
 
 import java.util.List;
 import java.util.Map;
@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,14 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-
-import org.springframework.web.bind.annotation.RequestParam;
-
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ct.user.constant.Messages;
@@ -40,7 +34,7 @@ import com.ct.user.service.StaffService;
 import lombok.extern.java.Log;
 
 @RestController
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @Log
 public class StaffController {
 
@@ -53,17 +47,16 @@ public class StaffController {
 	 * @return
 	 */
 	@GetMapping(value = "/employees")
-	public ResponseEntity<?> all(){
+	public ResponseEntity<?> all() {
 		log.info("INSIDE all()");
 		try {
-			
-			return new ResponseEntity<List<Staff>>(staffService.getAllStaffDetails(),HttpStatus.OK);
-			
+
+			return new ResponseEntity<List<Staff>>(staffService.getAllStaffDetails(), HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		catch(Exception e) {
-			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
+
 	}
 
 	/**
@@ -138,81 +131,76 @@ public class StaffController {
 	public List<Long> employeeCount() {
 		return staffService.getStaffCount();
 	}
-	
-	/* this method is edit the employees Status 
-	 * it will received the list of employees
-	 * and send it the staff service
-	 * */
+
+	/*
+	 * this method is edit the employees Status it will received the list of
+	 * employees and send it the staff service
+	 */
 	@PutMapping("employee/editstatus")
-	public ResponseEntity<?> editStaffStatus(@RequestBody List<Staff> employeeList ){
+	public ResponseEntity<?> editStaffStatus(@RequestBody List<Staff> employeeList) {
 		log.info(employeeList.toString());
 		log.info("Inside User service Controller to edit status");
-		 try{
-			staffService.editStaffStatus(employeeList);
-			return new ResponseEntity<String>("Status Edited",HttpStatus.OK);
-		}
-		
-		catch(Exception e) {
-			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	@GetMapping("employees/physicians")
-	public ResponseEntity<?>getAllPhysicians(){
 		try {
-			return new ResponseEntity<List<Staff>>(staffService.getAllPhysicians(),HttpStatus.OK);
+			staffService.editStaffStatus(employeeList);
+			return new ResponseEntity<String>("Status Edited", HttpStatus.OK);
 		}
-		catch(Exception e) {
+
+		catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	@GetMapping(value = "employees/user-list",produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Map<String, Object>> allEmployee(
-		
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size,
-			@RequestParam(defaultValue = "userId") String columnName,
-			@RequestParam(defaultValue = "ASC") String direction
-			){
+
+	@GetMapping("employees/physicians")
+	public ResponseEntity<?> getAllPhysicians() {
 		try {
-			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
-			Pageable paging = PageRequest.of(page, size,sort);	
-			log.info(paging.toString());
-			return new ResponseEntity<>(staffService.getAllEmployeeDetails(paging),HttpStatus.OK);
-			
+			return new ResponseEntity<List<Staff>>(staffService.getAllPhysicians(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		catch(Exception e) {
-			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-	}
-	@GetMapping(value = "employees/filteredstaff",produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Map<String, Object>> FilteredEmployee(
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "5") int size,
-			@RequestParam(defaultValue = "ASC") String direction,
-			@RequestParam(defaultValue = "")  String filterValue
-			){
-		try {
-		Sort sort = Sort.by(Sort.Direction.fromString(direction), "first_name");
-		Pageable paging = PageRequest.of(page, size,sort);
-			return new ResponseEntity<>(staffService.getFilteredEmployeeDetails(filterValue,paging),HttpStatus.OK);
-			
-		}
-		catch(Exception e) {	
-			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
 	}
 
-	@GetMapping(value="employees/allactiveemployees")
-	public ResponseEntity<?> getAllActiveEmployeeEmail(){
+	@GetMapping(value = "employees/user-list", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> allEmployee(
+
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size,
+			@RequestParam(defaultValue = "userId") String columnName,
+			@RequestParam(defaultValue = "ASC") String direction) {
 		try {
-			return new ResponseEntity<List<Staff>>(staffService.getAllActiveEmployees(),HttpStatus.OK);
+			Sort sort = Sort.by(Sort.Direction.fromString(direction), columnName);
+			Pageable paging = PageRequest.of(page, size, sort);
+			log.info(paging.toString());
+			return new ResponseEntity<>(staffService.getAllEmployeeDetails(paging), HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		catch(Exception e) {
-			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+
+	@GetMapping(value = "employees/filteredstaff", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> FilteredEmployee(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "ASC") String direction,
+			@RequestParam(defaultValue = "") String filterValue) {
+		try {
+			Sort sort = Sort.by(Sort.Direction.fromString(direction), "first_name");
+			Pageable paging = PageRequest.of(page, size, sort);
+			return new ResponseEntity<>(staffService.getFilteredEmployeeDetails(filterValue, paging), HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
+
+	@GetMapping(value = "employees/allactiveemployees")
+	public ResponseEntity<?> getAllActiveEmployeeEmail() {
+		try {
+			return new ResponseEntity<List<Staff>>(staffService.getAllActiveEmployees(), HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
 	@GetMapping("/employees/employeeId/{id}")
 	public Staff getEmployeeId(@PathVariable Integer id) {
 		return staffService.getEmployeeId(id);

@@ -8,19 +8,16 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.model.Patient;
-import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.PatientRepository;
-
 import com.ct.user.utility.EmailServiceImpl;
+
 import com.ct.user.utility.RandomPasswordGenerator;
+
 
 import lombok.extern.java.Log;
 
@@ -44,7 +41,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		newPatient.setLastName(patient.getLastName());
 		newPatient.setEmail(patient.getEmail());
 		newPatient.setBirthDate(patient.getBirthDate());
-		newPatient.setPassword(patient.getPassword());
+		newPatient.setPassword(passwordEncoder.encode(patient.getPassword()));
 		newPatient.setContactNo(patient.getContactNo());
 
 		newPatient.setAttempt(0);
@@ -105,22 +102,21 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		long activePatient = patientRepository.countByStatus("active");
 		long deactivePatient = patientRepository.countByStatus("deactive");
 		deactivePatient += patientRepository.countByStatus("block");
-		
+
 		List<Long> countList = new ArrayList<>();
 		countList.add(totalPatient);
 		countList.add(activePatient);
 		countList.add(deactivePatient);
-		
+
 		return countList;
 	}
-
-
 
 	@Override
 	public void editPatientStatus(List<Patient> patientList) {
 		Patient obj = new Patient();
 		log.info("Inside User Service Mehod to edit status");
 		for (Patient patient : patientList) {
+
 			 obj = patientRepository.getById(patient.getUserId());
 				obj.setUserId(patient.getUserId());
 				obj.setStatus(patient.getStatus());	
@@ -149,14 +145,13 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		response.put("totalElements", pagePatient.getTotalElements());
 		response.put("page", pagePatient.getNumber());
 		response.put("size", pagePatient.getSize());
-		
-		
+
 		return response;
 	}
 
 	@Override
-	public Map<String, Object> getFilteredPatientDetails(String filterValue,Pageable paging) {
-		Page<Patient> pagePatient = patientRepository.findAll(filterValue,paging);
+	public Map<String, Object> getFilteredPatientDetails(String filterValue, Pageable paging) {
+		Page<Patient> pagePatient = patientRepository.findAll(filterValue, paging);
 		log.info(pagePatient.toString());
 		List<Patient> patients = pagePatient.getContent();
 		Map<String, Object> response = new HashMap<>();
@@ -176,32 +171,27 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		return response;
 	}
 
+
 	@Override
 	public List<Patient> getAllActivePatients() {
 		return patientRepository.findAllByStatus("active");
 	}
+	
 	public void editStatusEmail(Patient user) {
 		String accountStatus = "";
-
 		if(user.getStatus().equals("active"))
 			accountStatus= "ACTIVATED";
-
 		else if(user.getStatus().equals("deactive"))
 			accountStatus= "DEACTIVATED";
-
 		else if(user.getStatus().equals("block"))
 			accountStatus= "BLOCKED";
-
-		String subject ="YOUR ACCOUNT IS "+accountStatus+" !";
-
+		String subject = "YOUR ACCOUNT IS " + accountStatus + " !";
 		String body = String.format(""
 				+ "Hello "+user.getFirstName()+",\n"
 				+ "This is an acknowledgement mail for your account with CT GENERAL HOSPITAL "
 				+ "We wanted to let you know that your account status has been changed.\n "
 				+ "Your account Status - "+accountStatus+" .\n");
-				
 				if(user.getStatus().equals("active")) {
-				
 				body += "Sign in to your account, ";
 				body += " please visit https://localhost:4200/ or Click here.\n";
 				body += "For Login use below One Time Password.\n ";
