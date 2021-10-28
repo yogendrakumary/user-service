@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.constant.FinalVariables;
@@ -35,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private EmailServiceImpl emailServiceImpl;
+
+	@Autowired
+	protected BCryptPasswordEncoder passwordEncoder;
 
 	@Override
 	public List<UserDto> getAllUserFromPatient(List<Patient> patients) {
@@ -107,8 +112,10 @@ public class UserServiceImpl implements UserService {
 		UserDto responseUserDto = null;
 		Integer attempt = user.getAttempt();
 
+		boolean isAuthenticated = passwordEncoder.matches(authDto.getPassword(), user.getPassword());
+
 		// If Incorrect Password or Attempt exceeds
-		if (!authDto.getPassword().equals(user.getPassword()) || user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
+		if (!isAuthenticated || user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
 
 			// If incorrect increment attempt and persist
 			attempt += 1;
@@ -119,7 +126,7 @@ public class UserServiceImpl implements UserService {
 			responseUserDto.setEmail(user.getEmail());
 			responseUserDto.setAttempt(attempt);
 
-		} else if (authDto.getPassword().equals(user.getPassword())) {
+		} else if (isAuthenticated) {
 			// Check Password is correct
 
 			if (user.getAttempt() >= 0 && user.getAttempt() <= FinalVariables.MAX_ATTEMPT) {
@@ -148,7 +155,7 @@ public class UserServiceImpl implements UserService {
 	public Optional<UserDto> resetUser(User user) {
 		log.info("INSIDE resetUser");
 
-		String resetPassword = "Welcome@123";
+		String resetPassword = RandomStringUtils.randomAlphabetic(10);
 
 		user.setAttempt(-1);
 		user.setPassword(resetPassword);
@@ -186,14 +193,15 @@ public class UserServiceImpl implements UserService {
 			}
 			// To Verify that old password is matching other wise don't change password
 			// To verify old password is matching with user entered old password
-			if (!userDto.getOldPassword().equals(currentDbPassword)) {
+			if (!passwordEncoder.matches(userDto.getOldPassword(), currentDbPassword)) {
 //				return Optional.empty();
 				throw new PasswordNotVerifiedException("Old password is not matching");
 			}
 
 			// new Password should not match old password
-			if (newPassoword.equals(currentDbPassword)) {
+			if (passwordEncoder.matches(newPassoword, currentDbPassword)) {
 //				return Optional.empty();
+
 				throw new PasswordNotVerifiedException("New password is same as old password");
 			}
 		}
