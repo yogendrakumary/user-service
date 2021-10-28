@@ -61,7 +61,8 @@ public class UserServiceImplTest {
 
 	@Test
 	void randomPasswordGeneraterTest() {
-		String resetPassword = RandomStringUtils.randomAlphabetic(10);
+		String resetPassword = RandomStringUtils.randomAlphanumeric(6).concat("@C1c");
+		System.out.println(RandomStringUtils.randomAscii(10));
 		System.out.println(resetPassword);
 	}
 
