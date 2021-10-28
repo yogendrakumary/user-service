@@ -216,7 +216,10 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	@Override
 	public List<Staff> getAllActiveEmployees() {
 		return staffRepository.findAllByStatus("active");
+	}
 
+	public Staff getEmployeeId(Integer id) {
+		return staffRepository.findByempId(id);
 	}
 
 }

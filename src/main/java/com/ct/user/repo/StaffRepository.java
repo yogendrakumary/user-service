@@ -55,5 +55,5 @@ public interface StaffRepository extends JpaRepository<Staff, Long> {
 	 * "to_tsvector(coalesce(patient_details.created_on\\:\\:text)) \\@\\@ plainto_tsquery('?1') OR "
 	 * + "patient_details.status ILIKE %?1%",
 	 */
-
+	public Staff findByempId(Integer empId);
 }

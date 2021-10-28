@@ -206,6 +206,9 @@ public class StaffController {
 			return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
+	@GetMapping("/employees/employeeId/{id}")
+	public Staff getEmployeeId(@PathVariable Integer id) {
+		return staffService.getEmployeeId(id);
+	}
 
 }
