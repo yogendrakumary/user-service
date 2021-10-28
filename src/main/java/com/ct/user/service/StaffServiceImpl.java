@@ -42,7 +42,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		Integer lastEmpId = staffRepository.getLastEmployeeId().orElse(0);
 
 		String otp = Utility.generateOtp();
-
+			otp="Welcome@123";
 		Staff newStaff = new Staff();
 
 		newStaff.setTitle(staff.getTitle());
