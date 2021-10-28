@@ -10,13 +10,12 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.ct.user.model.Patient;
 import com.ct.user.model.Staff;
 import com.ct.user.model.UserDto;
 import com.ct.user.repo.StaffRepository;
-
 import com.ct.user.utility.EmailServiceImpl;
 
 import lombok.extern.java.Log;
@@ -49,7 +48,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		newStaff.setRoleId(staff.getRoleId());
 		newStaff.setBirthDate(staff.getBirthDate());
 
-		newStaff.setPassword(otp);
+		newStaff.setPassword(passwordEncoder.encode(otp));
 		newStaff.setEmpId(lastEmpId + 1);
 
 		newStaff.setAttempt(-1);
