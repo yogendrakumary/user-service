@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.ct.user.exception.auth.BlankPasswordException;
 import com.ct.user.exception.auth.EmailIdAlreadyRegisteredException;
 import com.ct.user.exception.auth.EmailIdNotRegisteredException;
+import com.ct.user.exception.auth.IncorrectPasswordException;
 import com.ct.user.exception.auth.PasswordMaxAttemptException;
 import com.ct.user.exception.auth.PasswordNotVerifiedException;
 import com.ct.user.exception.auth.UserNotFoundException;
@@ -78,6 +79,18 @@ public class UserControllerAdvice {
 	@ResponseStatus(code = HttpStatus.UNAUTHORIZED)
 	@ExceptionHandler(BlankPasswordException.class)
 	public String handlerPasswordNotFoundException(BlankPasswordException ex) {
+		return ex.getMessage();
+	}
+	
+	/**
+	 * Incorrect Password Exception
+	 * 
+	 * @param ex
+	 * @return
+	 */
+	@ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+	@ExceptionHandler(IncorrectPasswordException.class)
+	public String handlerIncorrectPasswordException(IncorrectPasswordException ex) {
 		return ex.getMessage();
 	}
 

@@ -11,4 +11,6 @@ public class Messages {
 	// Patient Response Messages
 	public static final String PATIENT_ADDED_SUCCESSFULLY = "Patient added successfully.";
 	public static final String PATIENT_UPDATED_SUCCESSFULLY = "Patient details updated successfully.";
+
+	public static final String ERROR_MAX_ATTEMPT_INACTIVE = "Your account has been locked. Please contact the hospital administrator or call helpdesk on 123456 for more information.";
 }

@@ -69,9 +69,11 @@ public class AuthController {
 
 		UserResponse userResponse = userServiceImpl.getUserResponseFromUserDto(authenticatedUser);
 
-		if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT || authenticatedUser.getRoleId() == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
-		}
+//		if (authenticatedUser.getAttempt() >= FinalVariables.MAX_ATTEMPT
+//				|| authenticatedUser.getStatus().equals(FinalVariables.INACTIVE)
+//				|| authenticatedUser.getRoleId() == null) {
+//			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userResponse);
+//		}
 
 		final String token = jwtTokenUtil.generateToken(user);
 		userResponse.setAccessToken(token);

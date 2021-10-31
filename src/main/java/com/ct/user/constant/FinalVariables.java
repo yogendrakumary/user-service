@@ -16,4 +16,5 @@ public class FinalVariables {
 	public static final Integer PATIENT = 4;
 
 	public static final Integer MAX_ATTEMPT = 3;
+	public static final String INACTIVE = "deactive";
 }
