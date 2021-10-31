@@ -16,6 +16,9 @@ import com.ct.user.model.UserDto;
 import com.ct.user.repo.PatientRepository;
 import com.ct.user.utility.EmailServiceImpl;
 
+import com.ct.user.utility.RandomPasswordGenerator;
+
+
 import lombok.extern.java.Log;
 
 @Service
@@ -113,11 +116,14 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		Patient obj = new Patient();
 		log.info("Inside User Service Mehod to edit status");
 		for (Patient patient : patientList) {
-			obj = patientRepository.getById(patient.getUserId());
-			obj.setUserId(patient.getUserId());
-			obj.setStatus(patient.getStatus());
-			patientRepository.save(obj);
-			editStatusEmail(obj);
+
+			 obj = patientRepository.getById(patient.getUserId());
+				obj.setUserId(patient.getUserId());
+				obj.setStatus(patient.getStatus());	
+				if(obj.getStatus().equals("active"))
+					obj.setPassword(RandomPasswordGenerator.generatePassword());
+				patientRepository.save(obj);
+				editStatusEmail(obj);
 		}
 	}
 
@@ -165,37 +171,39 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		return response;
 	}
 
-	public void editStatusEmail(Patient patient) {
-		log.info(patient.getStatus());
-		log.info(patient.getFirstName());
-		String accountStatus = "";
-
-		if (patient.getStatus() == "active")
-			accountStatus = "ACTIVATED";
-
-		else if (patient.getStatus() == "deactive")
-			accountStatus = "DEACTIVATED";
-
-		else if (patient.getStatus() == "block")
-			accountStatus = "BLOCKED";
-
-		String subject = "YOUR ACCOUNT IS " + accountStatus + " !";
-
-		String body = String.format("" + "Hello" + patient.getFirstName() + ",/n"
-				+ "This is an acknowledgement mail for your account with CT GENERAL HOSPITAL "
-				+ "We wanted to let you know that your account status has been changed\r\n " + "Your account Status - "
-				+ accountStatus + "/n"
-				+ "To see this and other security events for your account, please contact to admin by visiting to hospital"
-				+ "If Your account has been activated , Sign in to your account, "
-				+ "please visit https://localhost:8080/ or Click here. \\r\\n\\r\\n ");
-
-		emailServiceImpl.sendSimpleMessage(patient.getEmail(), subject, body);
-
-	}
 
 	@Override
 	public List<Patient> getAllActivePatients() {
 		return patientRepository.findAllByStatus("active");
 	}
+	
+	public void editStatusEmail(Patient user) {
+		String accountStatus = "";
+		if(user.getStatus().equals("active"))
+			accountStatus= "ACTIVATED";
+		else if(user.getStatus().equals("deactive"))
+			accountStatus= "DEACTIVATED";
+		else if(user.getStatus().equals("block"))
+			accountStatus= "BLOCKED";
+		String subject = "YOUR ACCOUNT IS " + accountStatus + " !";
+		String body = String.format(""
+				+ "Hello "+user.getFirstName()+",\n"
+				+ "This is an acknowledgement mail for your account with CT GENERAL HOSPITAL "
+				+ "We wanted to let you know that your account status has been changed.\n "
+				+ "Your account Status - "+accountStatus+" .\n");
+				if(user.getStatus().equals("active")) {
+				body += "Sign in to your account, ";
+				body += " please visit https://localhost:4200/ or Click here.\n";
+				body += "For Login use below One Time Password.\n ";
+				body+= "      ONE TIME PASSWORD : "+user.getPassword() +".\n";
+				body += "Once you login kindly change your password";
+				}
+				body += "To see this and other security events for your account, please contact to admin by visiting to hospital";
+				body +="\n";
+				body +="\n";
+				body+= "ADMIN";
+				body +="CT General Hospital";
+		emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
 
+	}
 }
