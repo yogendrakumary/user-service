@@ -9,8 +9,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ct.user.constant.FinalVariables;
+import com.ct.user.constant.Messages;
 import com.ct.user.exception.RoleNotFoundException;
 import com.ct.user.exception.auth.EmailIdNotRegisteredException;
+import com.ct.user.exception.auth.IncorrectPasswordException;
 import com.ct.user.exception.auth.PasswordNotVerifiedException;
 import com.ct.user.model.AuthDto;
 import com.ct.user.model.Patient;
@@ -106,7 +108,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Optional<UserDto> authenticate(AuthDto authDto, User user) {
+	public Optional<UserDto> authenticate(AuthDto authDto, User user) throws IncorrectPasswordException {
 		log.info("INSIDE authenticate");
 
 		UserDto responseUserDto = null;
@@ -114,17 +116,39 @@ public class UserServiceImpl implements UserService {
 
 		boolean isAuthenticated = passwordEncoder.matches(authDto.getPassword(), user.getPassword());
 
-		// If Incorrect Password or Attempt exceeds
-		if (!isAuthenticated || user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
+		if (user.getStatus().equals(FinalVariables.INACTIVE)) {
+//			responseUserDto = new UserDto();
+//			responseUserDto.setEmail(user.getEmail());
+//			responseUserDto.setAttempt(attempt);
+//			responseUserDto.setStatus(user.getStatus());
+
+//			return Optional.of(responseUserDto);
+
+			String message = Messages.ERROR_MAX_ATTEMPT_INACTIVE;
+
+			throw new IncorrectPasswordException(message);
+		} else if (!isAuthenticated || user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
+			// If Incorrect Password or Attempt exceeds
 
 			// If incorrect increment attempt and persist
 			attempt += 1;
 			user.setAttempt(attempt);
 
+			userRepository.save(user);
+
 			// Setting only limited Details
-			responseUserDto = new UserDto();
-			responseUserDto.setEmail(user.getEmail());
-			responseUserDto.setAttempt(attempt);
+//			responseUserDto = new UserDto();
+//			responseUserDto.setEmail(user.getEmail());
+//			responseUserDto.setAttempt(attempt);
+
+			String message = "";
+			if (user.getAttempt() >= FinalVariables.MAX_ATTEMPT) {
+				message = Messages.ERROR_MAX_ATTEMPT_INACTIVE;
+			} else {
+				message = FinalVariables.MAX_ATTEMPT - user.getAttempt() + " login attempts remaining";
+			}
+
+			throw new IncorrectPasswordException(message);
 
 		} else if (isAuthenticated) {
 			// Check Password is correct
@@ -132,12 +156,14 @@ public class UserServiceImpl implements UserService {
 			if (user.getAttempt() >= 0 && user.getAttempt() <= FinalVariables.MAX_ATTEMPT) {
 				// If login successful then reset Attempt
 				user.setAttempt(0);
+
+				userRepository.save(user);
 			}
 
 			responseUserDto = this.mapUserToUserDto(user);
 		}
 
-		userRepository.save(user);
+//		userRepository.save(user);
 
 		return Optional.of(responseUserDto);
 	}
@@ -206,7 +232,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		user.setPassword(newPassoword);
+		user.setPassword(passwordEncoder.encode(newPassoword));
 		user.setAttempt(0); // To Reset Attempt when password update
 		user = userRepository.save(user);
 

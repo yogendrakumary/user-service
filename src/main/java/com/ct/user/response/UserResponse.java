@@ -23,6 +23,8 @@ public class UserResponse {
 	private String contactNo;
 
 	private Integer attempt;
+	
+	private String status;
 
 	private Integer roleId;
 
