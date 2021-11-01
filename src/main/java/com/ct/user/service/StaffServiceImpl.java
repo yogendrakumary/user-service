@@ -126,13 +126,14 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 	@Override
 	public void editStaffStatus(List<Staff> employeeList) {
 		Staff obj = new Staff();
+		String otp = Utility.generateOtp();
 		log.info("Inside User Service Mehod to edit Employee status");
 		for (Staff staff : employeeList) {
 			obj = staffRepository.getById(staff.getUserId());
 			obj.setUserId(staff.getUserId());
 			obj.setStatus(staff.getStatus());
 			if(obj.getStatus().equals("active"))
-				obj.setPassword(RandomPasswordGenerator.generatePassword());
+				obj.setPassword(passwordEncoder.encode(otp));
 			staffRepository.save(obj);
 			editStatusEmail(obj);
 		}

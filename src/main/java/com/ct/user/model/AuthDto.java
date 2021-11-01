@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 public class AuthDto {
 
+	private long userId;
 	@NotBlank(message = "Please enter your email address", groups = { LoginInfo.class, ForgetInfo.class })
 	private String email;
 

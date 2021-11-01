@@ -17,7 +17,7 @@ import com.ct.user.repo.PatientRepository;
 import com.ct.user.utility.EmailServiceImpl;
 
 import com.ct.user.utility.RandomPasswordGenerator;
-
+import com.ct.user.utility.Utility;
 
 import lombok.extern.java.Log;
 
@@ -114,6 +114,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 	@Override
 	public void editPatientStatus(List<Patient> patientList) {
 		Patient obj = new Patient();
+		String otp = Utility.generateOtp();
 		log.info("Inside User Service Mehod to edit status");
 		for (Patient patient : patientList) {
 
@@ -121,7 +122,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 				obj.setUserId(patient.getUserId());
 				obj.setStatus(patient.getStatus());	
 				if(obj.getStatus().equals("active"))
-					obj.setPassword(RandomPasswordGenerator.generatePassword());
+					obj.setPassword(passwordEncoder.encode(otp));
 				patientRepository.save(obj);
 				editStatusEmail(obj);
 		}

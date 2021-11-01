@@ -12,6 +12,7 @@
 	<groupId>com.ct</groupId>
 	<artifactId>user</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>user-service</name>
 	<description>User Service For Staff and Patient Registraion</description>
 	<properties>
