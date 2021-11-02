@@ -45,7 +45,7 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		newPatient.setContactNo(patient.getContactNo());
 
 		newPatient.setAttempt(0);
-
+		newPatient.setStatus("active");
 		newPatient = patientRepository.save(newPatient);
 
 		String subject = "Welcome to CT General Hospital!";
