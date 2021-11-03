@@ -43,10 +43,9 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		newPatient.setBirthDate(patient.getBirthDate());
 		newPatient.setPassword(passwordEncoder.encode(patient.getPassword()));
 		newPatient.setContactNo(patient.getContactNo());
-		
-		newPatient.setStatus("active");
 
 		newPatient.setAttempt(0);
+		newPatient.setStatus("active");
 
 		newPatient = patientRepository.save(newPatient);
 
@@ -120,13 +119,13 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		log.info("Inside User Service Mehod to edit status");
 		for (Patient patient : patientList) {
 
-			 obj = patientRepository.getById(patient.getUserId());
-				obj.setUserId(patient.getUserId());
-				obj.setStatus(patient.getStatus());	
-				if(obj.getStatus().equals("active"))
-					obj.setPassword(passwordEncoder.encode(otp));
-				patientRepository.save(obj);
-				editStatusEmail(obj);
+			obj = patientRepository.getById(patient.getUserId());
+			obj.setUserId(patient.getUserId());
+			obj.setStatus(patient.getStatus());
+			if (obj.getStatus().equals("active"))
+				obj.setPassword(passwordEncoder.encode(otp));
+			patientRepository.save(obj);
+			editStatusEmail(obj);
 		}
 	}
 
@@ -174,38 +173,36 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		return response;
 	}
 
-
 	@Override
 	public List<Patient> getAllActivePatients() {
 		return patientRepository.findAllByStatus("active");
 	}
-	
+
 	public void editStatusEmail(Patient user) {
 		String accountStatus = "";
-		if(user.getStatus().equals("active"))
-			accountStatus= "ACTIVATED";
-		else if(user.getStatus().equals("deactive"))
-			accountStatus= "DEACTIVATED";
-		else if(user.getStatus().equals("block"))
-			accountStatus= "BLOCKED";
+		if (user.getStatus().equals("active"))
+			accountStatus = "ACTIVATED";
+		else if (user.getStatus().equals("deactive"))
+			accountStatus = "DEACTIVATED";
+		else if (user.getStatus().equals("block"))
+			accountStatus = "BLOCKED";
 		String subject = "YOUR ACCOUNT IS " + accountStatus + " !";
-		String body = String.format(""
-				+ "Hello "+user.getFirstName()+",\n"
+		String body = String.format("" + "Hello " + user.getFirstName() + ",\n"
 				+ "This is an acknowledgement mail for your account with CT GENERAL HOSPITAL "
-				+ "We wanted to let you know that your account status has been changed.\n "
-				+ "Your account Status - "+accountStatus+" .\n");
-				if(user.getStatus().equals("active")) {
-				body += "Sign in to your account, ";
-				body += " please visit https://localhost:4200/ or Click here.\n";
-				body += "For Login use below One Time Password.\n ";
-				body+= "      ONE TIME PASSWORD : "+user.getPassword() +".\n";
-				body += "Once you login kindly change your password";
-				}
-				body += "To see this and other security events for your account, please contact to admin by visiting to hospital";
-				body +="\n";
-				body +="\n";
-				body+= "ADMIN";
-				body +="CT General Hospital";
+				+ "We wanted to let you know that your account status has been changed.\n " + "Your account Status - "
+				+ accountStatus + " .\n");
+		if (user.getStatus().equals("active")) {
+			body += "Sign in to your account, ";
+			body += " please visit https://localhost:4200/ or Click here.\n";
+			body += "For Login use below One Time Password.\n ";
+			body += "      ONE TIME PASSWORD : " + user.getPassword() + ".\n";
+			body += "Once you login kindly change your password";
+		}
+		body += "To see this and other security events for your account, please contact to admin by visiting to hospital";
+		body += "\n";
+		body += "\n";
+		body += "ADMIN";
+		body += "CT General Hospital";
 		emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
 
 	}

@@ -21,7 +21,6 @@ import com.ct.user.utility.RandomPasswordGenerator;
 
 import com.ct.user.utility.Utility;
 
-
 import lombok.extern.java.Log;
 
 @Service
@@ -42,7 +41,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		Integer lastEmpId = staffRepository.getLastEmployeeId().orElse(0);
 
 		String otp = Utility.generateOtp();
-			otp="Welcome@123";
+		otp = "Welcome@123";
 		Staff newStaff = new Staff();
 
 		newStaff.setTitle(staff.getTitle());
@@ -56,7 +55,6 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		newStaff.setEmpId(lastEmpId + 1);
 
 		newStaff.setAttempt(-1);
-		
 		newStaff.setStatus("active");
 
 		newStaff = staffRepository.save(newStaff);
@@ -134,7 +132,7 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 			obj = staffRepository.getById(staff.getUserId());
 			obj.setUserId(staff.getUserId());
 			obj.setStatus(staff.getStatus());
-			if(obj.getStatus().equals("active"))
+			if (obj.getStatus().equals("active"))
 				obj.setPassword(passwordEncoder.encode(otp));
 			staffRepository.save(obj);
 			editStatusEmail(obj);
@@ -161,25 +159,24 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 
 		String subject = "YOUR ACCOUNT IS " + accountStatus + " !";
 
-		String body = String.format(""
-				+ "Hello "+user.getFirstName()+",\n"
+		String body = String.format("" + "Hello " + user.getFirstName() + ",\n"
 				+ "This is an acknowledgement mail for your account with CT GENERAL HOSPITAL "
-				+ "We wanted to let you know that your account status has been changed.\n "
-				+ "Your account Status - "+accountStatus+" .\n");
-				
-				if(user.getStatus().equals("active")) {
-				
-				body += " Sign in to your account, ";
-				body += " please visit https://localhost:4200/ or Click here.\n";
-				body += " For Login use below One Time Password.\n ";
-				body+= " ONE TIME PASSWORD : "+user.getPassword() +".\n";
-				body += "Once you login kindly change your password";
-				}
-				body += "To see this and other security events for your account, please contact to admin by visiting to hospital";
-				body +="\n";
-				body +="\n";
-				body+= "ADMIN";
-				body +="CT General Hospital";
+				+ "We wanted to let you know that your account status has been changed.\n " + "Your account Status - "
+				+ accountStatus + " .\n");
+
+		if (user.getStatus().equals("active")) {
+
+			body += " Sign in to your account, ";
+			body += " please visit https://localhost:4200/ or Click here.\n";
+			body += " For Login use below One Time Password.\n ";
+			body += " ONE TIME PASSWORD : " + user.getPassword() + ".\n";
+			body += "Once you login kindly change your password";
+		}
+		body += "To see this and other security events for your account, please contact to admin by visiting to hospital";
+		body += "\n";
+		body += "\n";
+		body += "ADMIN";
+		body += "CT General Hospital";
 
 		emailServiceImpl.sendSimpleMessage(user.getEmail(), subject, body);
 
