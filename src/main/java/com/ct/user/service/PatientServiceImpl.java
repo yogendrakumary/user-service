@@ -43,6 +43,8 @@ public class PatientServiceImpl extends UserServiceImpl implements PatientServic
 		newPatient.setBirthDate(patient.getBirthDate());
 		newPatient.setPassword(passwordEncoder.encode(patient.getPassword()));
 		newPatient.setContactNo(patient.getContactNo());
+		
+		newPatient.setStatus("active");
 
 		newPatient.setAttempt(0);
 

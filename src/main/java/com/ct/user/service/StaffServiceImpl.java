@@ -56,6 +56,8 @@ public class StaffServiceImpl extends UserServiceImpl implements StaffService {
 		newStaff.setEmpId(lastEmpId + 1);
 
 		newStaff.setAttempt(-1);
+		
+		newStaff.setStatus("active");
 
 		newStaff = staffRepository.save(newStaff);
 
